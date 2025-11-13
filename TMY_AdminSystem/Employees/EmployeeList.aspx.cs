@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -19,8 +20,10 @@ namespace TMY_AdminSystem.Employees
             {
                 LoadDepartments();
                 LoadProfileData(); // 載入個人資料
+                LoadSalaryDetail(1);
             }
         }
+        
         // ✅ 載入部門 DropDownList
         private void LoadDepartments(int? currentDeptId = null)
         {
@@ -93,12 +96,91 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
+        private void LoadSalaryDetail(int salaryId)
+        {
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                // 1. 抓 SalaryItems（所有薪資細項）
+                string sql1 = @"SELECT ItemName, ItemAmount 
+                        FROM SalaryItems 
+                        WHERE SalaryID = @sid
+                        ORDER BY ItemType DESC"; 
+
+                SqlCommand cmd1 = new SqlCommand(sql1, conn);
+                cmd1.Parameters.AddWithValue("@sid", salaryId);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd1);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                gvSalaryDetail.DataSource = dt;
+                gvSalaryDetail.DataBind();
+
+                // 2. 抓主表 SalaryRecords（實領金額、日期）
+                string sql2 = @"SELECT NetPay, PayDate 
+                        FROM SalaryRecords 
+                        WHERE SalaryID = @sid";
+
+                SqlCommand cmd2 = new SqlCommand(sql2, conn);
+                cmd2.Parameters.AddWithValue("@sid", salaryId);
+
+                SqlDataReader dr = cmd2.ExecuteReader();
+                if (dr.Read())
+                {
+                    lblNetPay.Text = Convert.ToInt32(dr["NetPay"]).ToString("C0");
+                    lblPayDate.Text = Convert.ToDateTime(dr["PayDate"]).ToString("yyyy/MM/dd");
+                }
+                dr.Close();
+            }
+        }
+
+
+        
+
 
         // ✅ 儲存更新資料
         protected void btnSaveProfile_Click(object sender, EventArgs e)
         {
             int userId = Convert.ToInt32(Session["UserID"]);
+            // 先清除紅框
+            txtFullName.CssClass = txtFullName.CssClass.Replace(" input-error", "");
+            txtHireDate.CssClass = txtHireDate.CssClass.Replace(" input-error", "");
+            ddlDept.CssClass = ddlDept.CssClass.Replace(" input-error", "");
 
+            // =============================
+            // 🔍 必填檢查（全部寫在這裡）
+            // =============================
+
+            // 1. 姓名
+            if (string.IsNullOrWhiteSpace(txtFullName.Text))
+            {
+                txtFullName.CssClass += " input-error";
+                lblProfileMsg.Text = "❌ 姓名為必填欄位！";
+                return;
+            }
+
+            // 2. 入職日期
+            if (string.IsNullOrWhiteSpace(txtHireDate.Text))
+            {
+                txtHireDate.CssClass += " input-error";
+                lblProfileMsg.Text = "❌ 入職日期為必填欄位！";
+                return;
+            }
+
+            // 3. 部門
+            if (ddlDept.SelectedValue == "0" || string.IsNullOrEmpty(ddlDept.SelectedValue))
+            {
+                ddlDept.CssClass += " input-error";
+                lblProfileMsg.Text = "❌ 請選擇部門！";
+                return;
+            }
+
+            // -----------------------------
+            // ❇ 必填檢查通過 → 開始資料寫入
+            // -----------------------------
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
@@ -152,6 +234,59 @@ namespace TMY_AdminSystem.Employees
 
             lblProfileMsg.Text = "✅ 個人資料更新成功！";
         }
+
+        //年月份查詢
+        protected void btnSearchSalary_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(ddlYear.SelectedValue) ||
+                string.IsNullOrEmpty(ddlMonth.SelectedValue))
+            {
+                lblProfileMsg.Text = "❌ 請選擇完整的年份與月份！";
+                upSalary.Update();
+                return;
+            }
+
+            int year = Convert.ToInt32(ddlYear.SelectedValue);
+            int month = Convert.ToInt32(ddlMonth.SelectedValue);
+            int userId = Convert.ToInt32(Session["UserID"]);
+
+            string sql = @"SELECT SalaryID 
+                   FROM SalaryRecords
+                   WHERE EmployeeID=@emp AND SalaryYear=@y AND SalaryMonth=@m";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@emp", userId);
+                cmd.Parameters.AddWithValue("@y", year);
+                cmd.Parameters.AddWithValue("@m", month);
+
+                object result = cmd.ExecuteScalar();
+
+
+                if (result == null)
+                {
+                    lblProfileMsg2.Text = "⚠ 該月份沒有薪資資料。";
+                    gvSalaryDetail.DataSource = null;
+                    gvSalaryDetail.DataBind();
+                    lblNetPay.Text = "-";
+                    lblPayDate.Text = "-";
+
+                    upSalary.Update();
+                    return;
+                }
+
+                int salaryId = Convert.ToInt32(result);
+                LoadSalaryDetail(salaryId);
+            }
+
+            upSalary.Update();
+        }
+
+
+
 
     }
 

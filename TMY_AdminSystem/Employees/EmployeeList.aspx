@@ -65,7 +65,7 @@
         <div class="tab-content p-4">
 
             <!-- ✅ 個人資料 Tab -->
-<div class="tab-pane fade show active" id="content-profile">
+            <div class="tab-pane fade show active" id="content-profile">
     <h5 class="fw-bold mb-3">👤 個人資料</h5>
 
     <asp:Label ID="lblProfileMsg" runat="server" CssClass="text-success"></asp:Label>
@@ -128,8 +128,78 @@
             <!-- ✅ 薪資 Tab -->
             <div class="tab-pane fade" id="content-salary">
                 <h5 class="fw-bold mb-3">💰 薪資記錄</h5>
-                <p class="text-muted">此區顯示最近數期薪資資料。</p>
-                <!-- ⚠️ 待填充：薪資 GridView -->
+                 
+                <div class="tab-pane fade show active" id="salary" role="tabpanel">
+
+                    <asp:UpdatePanel ID="upSalary" runat="server" UpdateMode="Conditional">
+                        <ContentTemplate>
+                            <asp:Label ID="lblProfileMsg2" runat="server" CssClass="text-success"></asp:Label>
+                            <!-- 年份 / 月份搜尋 -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label>年份</label>
+                                    <asp:DropDownList ID="ddlYear" runat="server" CssClass="form-control">
+                                        <asp:ListItem Value="">請選擇</asp:ListItem>
+                                        <asp:ListItem Value="2025">2025</asp:ListItem>
+                                        <asp:ListItem Value="2024">2024</asp:ListItem>
+                                        <asp:ListItem Value="2023">2023</asp:ListItem>
+                                    </asp:DropDownList>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label>月份</label>
+                                    <asp:DropDownList ID="ddlMonth" runat="server" CssClass="form-control">
+                                        <asp:ListItem Value="">請選擇</asp:ListItem>
+                                        <asp:ListItem Value="1">1</asp:ListItem>
+                                        <asp:ListItem Value="2">2</asp:ListItem>
+                                        <asp:ListItem Value="3">3</asp:ListItem>
+                                        <asp:ListItem Value="4">4</asp:ListItem>
+                                        <asp:ListItem Value="5">6</asp:ListItem>
+                                        <asp:ListItem Value="6">6</asp:ListItem>
+                                        <asp:ListItem Value="7">7</asp:ListItem>
+                                        <asp:ListItem Value="8">8</asp:ListItem>
+                                        <asp:ListItem Value="9">9</asp:ListItem>
+                                        <asp:ListItem Value="10">10</asp:ListItem>
+                                        <asp:ListItem Value="11">11</asp:ListItem>
+                                        <asp:ListItem Value="12">12</asp:ListItem>
+                                    </asp:DropDownList>
+                                </div>
+
+
+                                <div class="col-md-3">
+                                    <asp:Button ID="btnSearchSalary" runat="server" CssClass="btn btn-primary mt-4"
+                                        Text="查詢" OnClick="btnSearchSalary_Click" />
+                                </div>
+                            </div>
+
+                            <!-- 薪資細項 GridView -->
+                            <asp:GridView ID="gvSalaryDetail" runat="server" CssClass="table table-bordered"
+                                AutoGenerateColumns="False">
+                                <Columns>
+                                    <asp:BoundField DataField="ItemName" HeaderText="項目" />
+                                    <asp:BoundField DataField="ItemAmount" HeaderText="金額" DataFormatString="{0:C0}" />
+                                </Columns>
+                            </asp:GridView>
+
+                            <label>實領金額：</label>
+                            <asp:Label ID="lblNetPay" runat="server" />
+
+                            <br />
+
+                            <label>發薪日：</label>
+                            <asp:Label ID="lblPayDate" runat="server" />
+
+                        </ContentTemplate>
+
+                        <Triggers>
+                            <asp:AsyncPostBackTrigger ControlID="btnSearchSalary" EventName="Click" />
+                        </Triggers>
+
+                    </asp:UpdatePanel>
+
+
+                </div>
+
             </div>
 
             <!-- ✅ 出勤 Tab -->

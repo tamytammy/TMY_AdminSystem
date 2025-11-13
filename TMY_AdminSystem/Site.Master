@@ -37,11 +37,16 @@
             padding: 25px;
         }
         .navbar {
-            position: relative;
+            position: sticky;
             top: 0;
             left: 220px;
             right: 0;
             z-index: 1000;
+        }
+
+        .input-error {
+            border: 2px solid #e74c3c !important;
+/*            background-color: #fff5f5 !important;*/
         }
     </style>
 
@@ -50,6 +55,8 @@
 
 <body>
     <form id="form1" runat="server">
+        <!-- 必須放在最前面！ -->
+    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
         <!-- 左側選單 -->
         <div class="sidebar">
             <h5 class="text-center mt-3">TMY Admin</h5>

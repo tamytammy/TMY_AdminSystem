@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.UI.WebControls;
 
 namespace TMY_AdminSystem
 {
@@ -15,5 +16,7 @@ namespace TMY_AdminSystem
         {
             lblUser.Text = username;
         }
+
+
     }
 }
