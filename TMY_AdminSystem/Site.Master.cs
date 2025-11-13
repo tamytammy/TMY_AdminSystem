@@ -10,6 +10,11 @@ namespace TMY_AdminSystem
             // 如果有登入，顯示使用者名稱
             if (Session["Username"] != null)
                 lblUser.Text = Session["Username"].ToString();
+            //超過時間強制登入
+            if (Session["UserID"] == null)
+            {
+                Response.Redirect("~/Login.aspx");
+            }
         }
 
         public void SetUserLabel(string username)
