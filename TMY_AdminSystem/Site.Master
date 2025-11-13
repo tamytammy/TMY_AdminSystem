@@ -37,7 +37,7 @@
             padding: 25px;
         }
         .navbar {
-            position: fixed;
+            position: relative;
             top: 0;
             left: 220px;
             right: 0;
@@ -61,17 +61,17 @@
         <i class="fa fa-users"></i> 員工管理
     </asp:HyperLink>
 
-    <asp:HyperLink runat="server" NavigateUrl="~/Announcements/AnnList.aspx" CssClass="sidebar-link">
+            <asp:HyperLink runat="server" NavigateUrl="~/Announcements/AnnList.aspx" CssClass="sidebar-link">
         <i class="fa fa-bullhorn"></i> 公告管理
-    </asp:HyperLink>
+            </asp:HyperLink>
 
-    <asp:HyperLink runat="server" NavigateUrl="~/Reports/Export.aspx" CssClass="sidebar-link">
-        <i class="fa fa-download"></i> 匯出報表
-    </asp:HyperLink>
+            <asp:HyperLink runat="server" NavigateUrl="~/Application/ApplicationList.aspx" CssClass="sidebar-link">
+        <i class="fas fa-file-signature"></i>公文審核申請
+            </asp:HyperLink>
 
-    <asp:HyperLink runat="server" NavigateUrl="~/Login.aspx?logout=1" CssClass="sidebar-link">
+            <asp:HyperLink runat="server" NavigateUrl="~/Login.aspx?logout=1" CssClass="sidebar-link">
         <i class="fa fa-sign-out-alt"></i> 登出
-    </asp:HyperLink>
+            </asp:HyperLink>
         </div>
 
         <!-- 上方導覽列 -->

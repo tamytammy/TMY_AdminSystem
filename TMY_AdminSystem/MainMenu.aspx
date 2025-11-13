@@ -27,8 +27,17 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-signature fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">公文審核申請</h5>
+                    <p class="card-text text-muted">申請、審核、退回、紀錄與統計管理</p>
+                    <a href="./Application/ApplicationList.aspx" class="btn btn-success btn-sm">進入管理</a>
+                </div>
+            </div>
+        </div>
+<%--        <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
                     <i class="fa fa-download fa-3x text-success mb-3"></i>
@@ -37,7 +46,9 @@
                     <a href="./Reports/Export.aspx" class="btn btn-success btn-sm">進入管理</a>
                 </div>
             </div>
-        </div>
+        </div>--%>
+
+
     </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="Scripts" runat="server">
