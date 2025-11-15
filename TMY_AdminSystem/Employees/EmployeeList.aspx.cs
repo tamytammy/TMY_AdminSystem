@@ -58,7 +58,7 @@ namespace TMY_AdminSystem.Employees
                     }
                 }
 
-                //LoadSalaryDetail();
+
                 //預設載入員工資料，當此使用者擁有權限
                 BindEmployees();
                 LoadAttendance();
