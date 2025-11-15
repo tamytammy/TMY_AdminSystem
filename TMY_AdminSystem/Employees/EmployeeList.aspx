@@ -16,85 +16,88 @@
         </ul>
     </div>
     <!-- 🔍 查詢區塊 -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <div class="row g-3">
+    <asp:Panel runat="server" ID="member_pl" Visible="false">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="row g-3">
 
-                <div class="col-md-3">
-                    <asp:TextBox ID="txtKeyword" runat="server" CssClass="form-control" placeholder="搜尋姓名 / 員工編號"></asp:TextBox>
-                </div>
+                    <div class="col-md-3">
+                        <asp:TextBox ID="txtKeyword" runat="server" CssClass="form-control" placeholder="搜尋姓名 / 員工編號"></asp:TextBox>
+                    </div>
 
-                <div class="col-md-3">
-                    <asp:DropDownList ID="ddlDept2" runat="server" CssClass="form-select">
-                        <asp:ListItem Value="">全部部門</asp:ListItem>
-                        <asp:ListItem Value="HR">人資部</asp:ListItem>
-                        <asp:ListItem Value="IT">資訊部</asp:ListItem>
-                        <asp:ListItem Value="RD">研發部</asp:ListItem>
-                    </asp:DropDownList>
-                </div>
+                    <div class="col-md-3">
+                        <asp:DropDownList ID="ddlDept2" runat="server" CssClass="form-select">
+                            <asp:ListItem Value="">全部部門</asp:ListItem>
+                            <asp:ListItem Value="HR">人資部</asp:ListItem>
+                            <asp:ListItem Value="IT">資訊部</asp:ListItem>
+                            <asp:ListItem Value="RD">研發部</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
 
-                <div class="col-md-3">
-                    <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select">
-                        <asp:ListItem Value="">全部在職狀態</asp:ListItem>
-                        <asp:ListItem Value="On">在職</asp:ListItem>
-                        <asp:ListItem Value="Leave">離職</asp:ListItem>
-                    </asp:DropDownList>
-                </div>
+                    <div class="col-md-3">
+                        <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select">
+                            <asp:ListItem Value="">全部在職狀態</asp:ListItem>
+                            <asp:ListItem Value="On">在職</asp:ListItem>
+                            <asp:ListItem Value="Leave">離職</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
 
-                <asp:UpdatePanel ID="upSearch" runat="server" UpdateMode="Conditional">
-                    <ContentTemplate>
+                    <asp:UpdatePanel ID="upSearch" runat="server" UpdateMode="Conditional">
+                        <ContentTemplate>
 
-                        <div class="col mb-3">
-                            <div class="col-md-3 d-grid">
-                                <asp:Button ID="btnSearch" runat="server" Text="查詢"
-                                    CssClass="btn btn-primary"
-                                    OnClick="btnSearch_Click" />
+                            <div class="col mb-3">
+                                <div class="col-md-3 d-grid">
+                                    <asp:Button ID="btnSearch" runat="server" Text="查詢"
+                                        CssClass="btn btn-primary"
+                                        OnClick="btnSearch_Click" />
+                                </div>
                             </div>
-                        </div>
 
-                        <asp:GridView ID="gvResult" runat="server"
-                            CssClass="gov-grid"
-                            HeaderStyle-CssClass="gov-grid-header"
-                            RowStyle-CssClass="gov-grid-row"
-                            AlternatingRowStyle-CssClass="gov-grid-alt"
-                            AutoGenerateColumns="False"
-                            OnRowCommand="gvResult_RowCommand">
+                            <asp:GridView ID="gvResult" runat="server"
+                                CssClass="gov-grid"
+                                HeaderStyle-CssClass="gov-grid-header"
+                                RowStyle-CssClass="gov-grid-row"
+                                AlternatingRowStyle-CssClass="gov-grid-alt"
+                                AutoGenerateColumns="False"
+                                OnRowCommand="gvResult_RowCommand">
 
-                            <Columns>
-                                <asp:TemplateField HeaderText="員工編號">
-                                    <ItemTemplate>
-                                        <%# "TMY" + String.Format("{0:000}", Eval("EmployeeID")) %>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                                <asp:BoundField DataField="FullName" HeaderText="姓名" />
-                                <asp:BoundField DataField="Email" HeaderText="電子郵件" />
-                                <asp:BoundField DataField="DeptName" HeaderText="部門" />
-                                <asp:BoundField DataField="JobTitle" HeaderText="職稱" />
-                                <asp:BoundField DataField="JobGrade" HeaderText="職等" />
-                                <asp:BoundField DataField="HireDate" HeaderText="錄用日期" DataFormatString="{0:yyyy-MM-dd}" />
-                                <asp:TemplateField HeaderText="操作">
-                                    <ItemTemplate>
-                                        <asp:Button
-                                            ID="btnOpenResetModal"
-                                            runat="server"
-                                            Text="重設密碼"
-                                            CssClass="btn btn-warning btn-sm"
-                                            CommandName="OpenResetModal"
-                                            CommandArgument='<%# Eval("EmployeeID") %>' />
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                            </Columns>
+                                <Columns>
+                                    <asp:TemplateField HeaderText="員工編號">
+                                        <ItemTemplate>
+                                            <%# "TMY" + String.Format("{0:000}", Eval("EmployeeID")) %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:BoundField DataField="FullName" HeaderText="姓名" />
+                                    <asp:BoundField DataField="Email" HeaderText="電子郵件" />
+                                    <asp:BoundField DataField="DeptName" HeaderText="部門" />
+                                    <asp:BoundField DataField="JobTitle" HeaderText="職稱" />
+                                    <asp:BoundField DataField="JobGrade" HeaderText="職等" />
+                                    <asp:BoundField DataField="HireDate" HeaderText="錄用日期" DataFormatString="{0:yyyy-MM-dd}" />
+                                    <asp:TemplateField HeaderText="操作">
+                                        <ItemTemplate>
+                                            <asp:Button
+                                                ID="btnOpenResetModal"
+                                                runat="server"
+                                                Text="重設密碼"
+                                                CssClass="btn btn-warning btn-sm"
+                                                CommandName="OpenResetModal"
+                                                CommandArgument='<%# Eval("EmployeeID") %>' />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
 
-                        </asp:GridView>
-
-
-                    </ContentTemplate>
-                </asp:UpdatePanel>
+                            </asp:GridView>
 
 
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+
+
+                </div>
             </div>
         </div>
-    </div>
+    </asp:Panel>
+   
         <!-- 📑 Tabs 區域 -->
     <div class="card shadow-sm mb-4">
         <div class="card-header">
@@ -172,7 +175,6 @@
         </div>
     </div>
 </div>
-
 
             <!-- ✅ 薪資 Tab -->
             <div class="tab-pane fade" id="content-salary">
@@ -327,45 +329,15 @@
             </div>
 
         </div>
-    </div
-    <!-- 📋 員工清單 -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-
-            <asp:GridView ID="gvEmployees" runat="server" CssClass="table table-bordered table-hover mb-0"
-                AutoGenerateColumns="False" AllowPaging="True" PageSize="10" DataKeyNames="EmployeeID">
-
-                <Columns>
-                    <asp:BoundField DataField="EmployeeID" HeaderText="員工編號" />
-                    <asp:BoundField DataField="Name" HeaderText="姓名" />
-                    <asp:BoundField DataField="Department" HeaderText="部門" />
-                    <asp:BoundField DataField="JobTitle" HeaderText="職稱" />
-                    <asp:BoundField DataField="EntryDate" HeaderText="入職日期" DataFormatString="{0:yyyy/MM/dd}" />
-                    <asp:BoundField DataField="Status" HeaderText="狀態" />
-
-                    <%--<!-- 管理者動作按鈕 -->--%>
-                    <asp:TemplateField HeaderText="操作">
-                        <ItemTemplate>
-                            <asp:HyperLink ID="lnkEdit" runat="server" CssClass="btn btn-sm btn-warning me-1"
-                                NavigateUrl='<%# "~/Employees/EmployeeEdit.aspx?id=" + Eval("EmployeeID") %>'>編輯</asp:HyperLink>
-
-                            <asp:LinkButton ID="btnDelete" runat="server" CssClass="btn btn-sm btn-danger"
-                                CommandName="Delete" CommandArgument='<%# Eval("EmployeeID") %>'
-                                OnClientClick="return confirm('確定要刪除這筆資料嗎？');">刪除</asp:LinkButton>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                </Columns>
-
-            </asp:GridView>
-
-        </div>
     </div>
+
+   
 
     <!-- 新增員工按鈕（後面會加入權限判斷） -->
     <div class="mt-3">
         <asp:HyperLink ID="lnkAddEmployee" runat="server"
             NavigateUrl="~/Register.aspx"
-            CssClass="btn btn-success">
+            CssClass="btn btn-success" Visible="false">
         新增員工
         </asp:HyperLink>
     </div>

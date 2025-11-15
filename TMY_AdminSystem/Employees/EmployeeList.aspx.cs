@@ -21,7 +21,7 @@ namespace TMY_AdminSystem.Employees
             if (!IsPostBack)
             {
                 LoadDepartments();
-                LoadProfileData(); // 載入個人資料
+                LoadProfileData(); 
                 if (Session["UserID"] != null)
                 {
                     int userId = Convert.ToInt32(Session["UserID"]);
@@ -62,6 +62,12 @@ namespace TMY_AdminSystem.Employees
                 //預設載入員工資料，當此使用者擁有權限
                 BindEmployees();
                 LoadAttendance();
+
+                if(Session["UserRole"] != null && Session["UserRole"].ToString() == "Admin")
+                {
+                    member_pl.Visible = true;
+                    lnkAddEmployee.Visible = true;
+                }
             }
         }
         
@@ -132,6 +138,8 @@ namespace TMY_AdminSystem.Employees
                     {
                         LoadDepartments(null); // 載入所有並顯示「請選擇部門」
                     }
+
+                  
                 }
                 conn.Close();
             }
