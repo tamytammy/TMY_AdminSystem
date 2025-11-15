@@ -21,7 +21,9 @@
     border: 1px solid #e0e0e0;
     padding: 8px 12px;
 }
-
+.gov-grid-row{
+    text-align:center;
+}
 /* 🟨 間隔列 */
 .gov-grid-alt td {
     background-color: #fafafa;

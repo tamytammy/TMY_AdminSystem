@@ -240,13 +240,13 @@ namespace TMY_AdminSystem.Employees
         protected global::System.Web.UI.WebControls.GridView gvEmployees;
 
         /// <summary>
-        /// btnAdd 控制項。
+        /// lnkAddEmployee 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAdd;
+        protected global::System.Web.UI.WebControls.HyperLink lnkAddEmployee;
 
         /// <summary>
         /// lblResetUserId 控制項。

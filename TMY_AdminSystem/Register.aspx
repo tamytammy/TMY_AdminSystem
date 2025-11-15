@@ -8,7 +8,7 @@
         body { font-family: Arial; padding: 40px; }
         .form-box { width: 350px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 6px; }
         input[type=text], input[type=password], input[type=email] {
-            width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #aaa;
+             width: 94%; padding: 10px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #aaa;
         }
         .btn { width: 100%; background: #0078d7; color: #fff; padding: 10px; border: none; cursor: pointer; }
         .btn:hover { background: #005fa3; }

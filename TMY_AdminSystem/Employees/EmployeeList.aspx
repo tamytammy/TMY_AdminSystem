@@ -289,9 +289,13 @@
         </div>
     </div>
 
-    <!-- ➕ 新增員工按鈕（後面會加入權限判斷） -->
+    <!-- 新增員工按鈕（後面會加入權限判斷） -->
     <div class="mt-3">
-        <asp:Button ID="btnAdd" runat="server" Text="新增員工" CssClass="btn btn-success" />
+        <asp:HyperLink ID="lnkAddEmployee" runat="server"
+            NavigateUrl="~/Register.aspx"
+            CssClass="btn btn-success">
+        新增員工
+        </asp:HyperLink>
     </div>
     <!-- 重設密碼 Modal -->
     <div class="modal fade" id="resetPwdModal" tabindex="-1" aria-hidden="true">
