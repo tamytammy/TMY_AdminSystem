@@ -4,6 +4,8 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 //using System.Web.UI.Page;
@@ -21,6 +23,8 @@ namespace TMY_AdminSystem.Employees
                 LoadDepartments();
                 LoadProfileData(); // 載入個人資料
                 LoadSalaryDetail(1);
+                //預設載入員工資料，當此使用者擁有權限
+                BindEmployees(); 
             }
         }
         
@@ -235,7 +239,119 @@ namespace TMY_AdminSystem.Employees
             lblProfileMsg.Text = "✅ 個人資料更新成功！";
         }
 
-        //年月份查詢
+        //員工管理 查詢
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            BindEmployees();
+            upSearch.Update(); 
+        }
+
+        protected void gvResult_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "OpenResetModal")
+            {
+                string empId = e.CommandArgument.ToString();
+
+                // 暫存 employeeID 在 hidden label
+                lblResetUserId.Text = empId;
+
+                // 清空欄位
+                txtNewPwd.Text = "";
+                txtConfirmPwd.Text = "";
+                lblResetMsg.Text = "";
+
+                // 開啟 Modal
+                ScriptManager.RegisterStartupScript(this, GetType(),
+                    "ShowResetPwdModal", "$('#resetPwdModal').modal('show');", true);
+            }
+        }
+
+        //重設密碼確認按鈕
+        protected void btnConfirmReset_Click(object sender, EventArgs e)
+        {
+            string newPwd = txtNewPwd.Text.Trim();
+            string confirm = txtConfirmPwd.Text.Trim();
+            int empId = Convert.ToInt32(lblResetUserId.Text);
+
+            if (newPwd == "" || confirm == "")
+            {
+                lblResetMsg.Text = "❗ 密碼欄位不可為空！";
+                ScriptManager.RegisterStartupScript(this, GetType(), "ShowAgain", "$('#resetPwdModal').modal('show');", true);
+                return;
+            }
+
+            if (newPwd != confirm)
+            {
+                lblResetMsg.Text = "❗ 兩次輸入的密碼不一致！";
+                ScriptManager.RegisterStartupScript(this, GetType(), "ShowAgain", "$('#resetPwdModal').modal('show');", true);
+                return;
+            }
+
+            // 產生新 Salt
+            string salt = Guid.NewGuid().ToString("N").Substring(0, 8);
+
+            // Hash 新密碼
+            string hashPwd = HashPassword(newPwd, salt);
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                string sql = @"UPDATE Users 
+                       SET PasswordHash=@hash,
+                           Salt=@salt,
+                           FailedCount=0,
+                           LockUntil=NULL
+                       WHERE UserID=@id";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@hash", hashPwd);
+                cmd.Parameters.AddWithValue("@salt", salt);
+                cmd.Parameters.AddWithValue("@id", empId);
+
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+
+            // 顯示成功訊息
+            //lblMessage.Text = "✅ 密碼已成功重設！";
+
+            // 關閉 Modal
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                "HideReset", "$('#resetPwdModal').modal('hide');", true);
+        }
+
+
+        private void BindEmployees()
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = @"
+            SELECT E.EmployeeID, E.FullName, E.Email, D.DeptName, 
+                   E.JobTitle, E.JobGrade, E.HireDate
+            FROM Employees E
+            LEFT JOIN Departments D ON E.DeptID = D.DeptID
+        ";
+
+                SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                gvResult.DataSource = dt;
+                gvResult.DataBind();
+            }
+        }
+
+        private string HashPassword(string password, string salt)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(password + salt);
+                byte[] hash = sha.ComputeHash(bytes);
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            }
+        }
+        //薪資年月份查詢
         protected void btnSearchSalary_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(ddlYear.SelectedValue) ||

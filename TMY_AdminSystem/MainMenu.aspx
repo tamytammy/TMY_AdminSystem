@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="首頁" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true"
     CodeBehind="MainMenu.aspx.cs" Inherits="TMY_AdminSystem.MainMenu" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+    <link href="css/EmployeeList.css" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
      <h2 class="fw-bold mb-4">系統主選單</h2>

@@ -1,6 +1,8 @@
 ﻿<%@ Page Title="員工管理" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true"
     CodeBehind="EmployeeList.aspx.cs" Inherits="TMY_AdminSystem.Employees.EmployeeList" %>
-
+<asp:Content ID="Content2" ContentPlaceHolderID="HeadContent" runat="server">
+    <link href="../css/EmployeeList.css" rel="stylesheet" />
+</asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
     <h3 class="fw-bold mb-3">員工管理</h3>
@@ -39,9 +41,52 @@
                     </asp:DropDownList>
                 </div>
 
-                <div class="col-md-3 d-grid">
-                    <asp:Button ID="btnSearch" runat="server" Text="查詢" CssClass="btn btn-primary" />
-                </div>
+                <asp:UpdatePanel ID="upSearch" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <div class="col mb-3">
+                            <div class="col-md-3 d-grid">
+                                <asp:Button ID="btnSearch" runat="server" Text="查詢"
+                                    CssClass="btn btn-primary"
+                                    OnClick="btnSearch_Click" />
+                            </div>
+                        </div>
+
+                        <asp:GridView ID="gvResult" runat="server"
+                            CssClass="gov-grid"
+                            HeaderStyle-CssClass="gov-grid-header"
+                            RowStyle-CssClass="gov-grid-row"
+                            AlternatingRowStyle-CssClass="gov-grid-alt"
+                            AutoGenerateColumns="False"
+                            OnRowCommand="gvResult_RowCommand">
+
+                            <Columns>
+                                <asp:BoundField DataField="EmployeeID" HeaderText="員工編號" />
+                                <asp:BoundField DataField="FullName" HeaderText="姓名" />
+                                <asp:BoundField DataField="Email" HeaderText="電子郵件" />
+                                <asp:BoundField DataField="DeptName" HeaderText="部門" />
+                                <asp:BoundField DataField="JobTitle" HeaderText="職稱" />
+                                <asp:BoundField DataField="JobGrade" HeaderText="職等" />
+                                <asp:BoundField DataField="HireDate" HeaderText="錄用日期" DataFormatString="{0:yyyy-MM-dd}" />
+                                <asp:TemplateField HeaderText="操作">
+                                    <ItemTemplate>
+                                        <asp:Button
+                                            ID="btnOpenResetModal"
+                                            runat="server"
+                                            Text="重設密碼"
+                                            CssClass="btn btn-warning btn-sm"
+                                            CommandName="OpenResetModal"
+                                            CommandArgument='<%# Eval("EmployeeID") %>' />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                            </Columns>
+
+                        </asp:GridView>
+
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
 
             </div>
         </div>
@@ -247,6 +292,42 @@
     <!-- ➕ 新增員工按鈕（後面會加入權限判斷） -->
     <div class="mt-3">
         <asp:Button ID="btnAdd" runat="server" Text="新增員工" CssClass="btn btn-success" />
+    </div>
+    <!-- 重設密碼 Modal -->
+    <div class="modal fade" id="resetPwdModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">重設密碼</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <asp:Label ID="lblResetUserId" runat="server" Visible="false"></asp:Label>
+
+                    <div class="mb-3">
+                        <label class="form-label">新密碼</label>
+                        <asp:TextBox ID="txtNewPwd" runat="server" CssClass="form-control" TextMode="Password" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">確認密碼</label>
+                        <asp:TextBox ID="txtConfirmPwd" runat="server" CssClass="form-control" TextMode="Password" />
+                    </div>
+
+                    <asp:Label ID="lblResetMsg" runat="server" CssClass="text-danger"></asp:Label>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <asp:Button ID="btnConfirmReset" runat="server" Text="確認重設" CssClass="btn btn-primary" OnClick="btnConfirmReset_Click" />
+                </div>
+
+            </div>
+        </div>
     </div>
 
 </asp:Content>

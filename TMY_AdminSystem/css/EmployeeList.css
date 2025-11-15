@@ -1,0 +1,36 @@
+﻿/* 🟦 政府系統標準 GridView 外框 */
+.gov-grid {
+    width: 100%;
+    border: 1px solid #c8c8c8;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* 🟦 表頭（政府 MIS 藍） */
+.gov-grid-header th {
+    background-color: #e6f0ff;
+    border: 1px solid #b5c7e3;
+    padding: 10px;
+    font-weight: bold;
+    white-space: nowrap; /* 阻止表頭換行 */
+}
+
+/* 🟩 一般列 */
+.gov-grid-row td {
+    border: 1px solid #e0e0e0;
+    padding: 8px 12px;
+}
+
+/* 🟨 間隔列 */
+.gov-grid-alt td {
+    background-color: #fafafa;
+    border: 1px solid #e0e0e0;
+    padding: 8px 12px;
+}
+
+/* 🟡 滑過效果（政府常用） */
+.gov-grid-row:hover td,
+.gov-grid-alt:hover td {
+    background-color: #fff2cc !important;
+}

@@ -42,6 +42,15 @@ namespace TMY_AdminSystem.Employees
         protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
 
         /// <summary>
+        /// upSearch 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel upSearch;
+
+        /// <summary>
         /// btnSearch 控制項。
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace TMY_AdminSystem.Employees
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnSearch;
+
+        /// <summary>
+        /// gvResult 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvResult;
 
         /// <summary>
         /// lblProfileMsg 控制項。
@@ -229,5 +247,50 @@ namespace TMY_AdminSystem.Employees
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnAdd;
+
+        /// <summary>
+        /// lblResetUserId 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblResetUserId;
+
+        /// <summary>
+        /// txtNewPwd 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNewPwd;
+
+        /// <summary>
+        /// txtConfirmPwd 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtConfirmPwd;
+
+        /// <summary>
+        /// lblResetMsg 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblResetMsg;
+
+        /// <summary>
+        /// btnConfirmReset 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnConfirmReset;
     }
 }
