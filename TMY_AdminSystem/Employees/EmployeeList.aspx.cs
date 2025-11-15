@@ -24,7 +24,8 @@ namespace TMY_AdminSystem.Employees
                 LoadProfileData(); // 載入個人資料
                 LoadSalaryDetail(1);
                 //預設載入員工資料，當此使用者擁有權限
-                BindEmployees(); 
+                BindEmployees();
+                LoadAttendance();
             }
         }
         
@@ -141,8 +142,44 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
+        private void LoadAttendance()
+        {
+            string empId = Session["UserID"].ToString();
+            //int year = Convert.ToInt32(ddlAttYear.SelectedValue);
+            //int month = Convert.ToInt32(ddlAttMonth.SelectedValue);
 
-        
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = @"
+            SELECT WorkDate, 
+                   CONVERT(VARCHAR(5), CheckInTime, 108) AS CheckInTime,
+                   CONVERT(VARCHAR(5), CheckOutTime, 108) AS CheckOutTime,
+                   WorkHours, 
+                   OvertimeHours, 
+                   LeaveType, 
+                   Remark
+            FROM AttendanceRecords
+            WHERE EmployeeID = @emp
+            ORDER BY WorkDate";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@emp", empId);
+                //cmd.Parameters.AddWithValue("@y", year);
+                //cmd.Parameters.AddWithValue("@m", month);
+
+                conn.Open();
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                gvAttendance.DataSource = dt;
+                gvAttendance.DataBind();
+            }
+        }
+
+
+
 
 
         // ✅ 儲存更新資料
@@ -321,7 +358,6 @@ namespace TMY_AdminSystem.Employees
                 "HideReset", "$('#resetPwdModal').modal('hide');", true);
         }
 
-
         private void BindEmployees()
         {
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -351,7 +387,7 @@ namespace TMY_AdminSystem.Employees
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
-        //薪資年月份查詢
+        //薪資紀錄查詢
         protected void btnSearchSalary_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(ddlYear.SelectedValue) ||
@@ -400,6 +436,47 @@ namespace TMY_AdminSystem.Employees
 
             upSalary.Update();
         }
+
+        //出勤資料查詢
+        protected void btnSearchAttendance_Click(object sender, EventArgs e)
+        {
+            LoadAttendance();
+            upAttendance.Update();
+        }
+
+        protected void gvAttendance_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                string leave = DataBinder.Eval(e.Row.DataItem, "LeaveType")?.ToString();
+                string overtime = DataBinder.Eval(e.Row.DataItem, "OvertimeHours")?.ToString();
+                string checkin = DataBinder.Eval(e.Row.DataItem, "CheckInTime")?.ToString();
+
+                // 請假（黃色）
+                if (!string.IsNullOrEmpty(leave))
+                {
+                    e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFF3CD"); // 淡黃
+                    return;
+                }
+
+                // 無打卡（淡紅）
+                if (string.IsNullOrEmpty(checkin))
+                {
+                    e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#F8D7DA");
+                    return;
+                }
+
+                // 加班（淡綠）
+                if (decimal.TryParse(overtime, out decimal ot) && ot > 0)
+                {
+                    e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#D4EDDA"); // 綠色
+                    return;
+                }
+
+                // 正常出勤（白色） → 不需特別設定
+            }
+        }
+
 
 
 

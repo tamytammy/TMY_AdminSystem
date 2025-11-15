@@ -4,7 +4,7 @@
     border: 1px solid #c8c8c8;
     border-collapse: collapse;
     font-size: 14px;
-    text-align: left;
+    text-align: right;
 }
 
 /* 🟦 表頭（政府 MIS 藍） */
@@ -21,8 +21,8 @@
     border: 1px solid #e0e0e0;
     padding: 8px 12px;
 }
-.gov-grid-row{
-    text-align:center;
+.gov-grid-row, .gov-grid-alt {
+    text-align: center;
 }
 /* 🟨 間隔列 */
 .gov-grid-alt td {

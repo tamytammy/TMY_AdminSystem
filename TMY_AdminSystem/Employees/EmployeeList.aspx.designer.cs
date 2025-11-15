@@ -231,6 +231,51 @@ namespace TMY_AdminSystem.Employees
         protected global::System.Web.UI.WebControls.Label lblPayDate;
 
         /// <summary>
+        /// upAttendance 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel upAttendance;
+
+        /// <summary>
+        /// dd1Year_1 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList dd1Year_1;
+
+        /// <summary>
+        /// dd1Month_1 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList dd1Month_1;
+
+        /// <summary>
+        /// btnSearchAttendance 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSearchAttendance;
+
+        /// <summary>
+        /// gvAttendance 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvAttendance;
+
+        /// <summary>
         /// gvEmployees 控制項。
         /// </summary>
         /// <remarks>

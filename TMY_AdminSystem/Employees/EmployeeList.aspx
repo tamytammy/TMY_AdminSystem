@@ -61,7 +61,11 @@
                             OnRowCommand="gvResult_RowCommand">
 
                             <Columns>
-                                <asp:BoundField DataField="EmployeeID" HeaderText="員工編號" />
+                                <asp:TemplateField HeaderText="員工編號">
+                                    <ItemTemplate>
+                                        <%# "TMY" + String.Format("{0:000}", Eval("EmployeeID")) %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
                                 <asp:BoundField DataField="FullName" HeaderText="姓名" />
                                 <asp:BoundField DataField="Email" HeaderText="電子郵件" />
                                 <asp:BoundField DataField="DeptName" HeaderText="部門" />
@@ -251,7 +255,75 @@
             <div class="tab-pane fade" id="content-attendance">
                 <h5 class="fw-bold mb-3">🕒 出勤記錄</h5>
                 <p class="text-muted">此區顯示本月與歷史出勤、加班與請假資訊。</p>
-                <!-- ⚠️ 待填充：出勤記錄清單 -->
+                <asp:UpdatePanel ID="upAttendance" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <!-- 年 / 月 選擇 -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label>年份</label>
+                                <asp:DropDownList ID="dd1Year_1" runat="server" CssClass="form-control">
+                                    <asp:ListItem Value="">請選擇</asp:ListItem>
+                                    <asp:ListItem Value="2025">2025</asp:ListItem>
+                                    <asp:ListItem Value="2024">2024</asp:ListItem>
+                                    <asp:ListItem Value="2023">2023</asp:ListItem>
+                                </asp:DropDownList>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>月份</label>
+                                <asp:DropDownList ID="dd1Month_1" runat="server" CssClass="form-control">
+                                    <asp:ListItem Value="">請選擇</asp:ListItem>
+                                    <asp:ListItem Value="1">1</asp:ListItem>
+                                    <asp:ListItem Value="2">2</asp:ListItem>
+                                    <asp:ListItem Value="3">3</asp:ListItem>
+                                    <asp:ListItem Value="4">4</asp:ListItem>
+                                    <asp:ListItem Value="5">6</asp:ListItem>
+                                    <asp:ListItem Value="6">6</asp:ListItem>
+                                    <asp:ListItem Value="7">7</asp:ListItem>
+                                    <asp:ListItem Value="8">8</asp:ListItem>
+                                    <asp:ListItem Value="9">9</asp:ListItem>
+                                    <asp:ListItem Value="10">10</asp:ListItem>
+                                    <asp:ListItem Value="11">11</asp:ListItem>
+                                    <asp:ListItem Value="12">12</asp:ListItem>
+                                </asp:DropDownList>
+                            </div>
+
+                            <div class="col-md-3 d-grid">
+                                <asp:Button ID="btnSearchAttendance" runat="server"
+                                    Text="查詢" CssClass="btn btn-primary mt-4"
+                                    OnClick="btnSearchAttendance_Click" />
+                            </div>
+                        </div>
+
+                        <!-- GridView：出勤紀錄 -->
+                        <asp:GridView ID="gvAttendance" runat="server"
+                            AutoGenerateColumns="False"
+                            CssClass="table table-bordered gov-grid"
+                            HeaderStyle-CssClass="gov-grid-header"
+                            RowStyle-CssClass="gov-grid-row"
+                            AlternatingRowStyle-CssClass="gov-grid-alt"
+                            OnRowDataBound="gvAttendance_RowDataBound">
+
+                            <Columns>
+                                <asp:BoundField DataField="WorkDate" HeaderText="日期" DataFormatString="{0:yyyy/MM/dd}" />
+                                <asp:BoundField DataField="CheckInTime" HeaderText="上班時間" />
+                                <asp:BoundField DataField="CheckOutTime" HeaderText="下班時間" />
+                                <asp:BoundField DataField="WorkHours" HeaderText="工作時數" />
+                                <asp:BoundField DataField="OvertimeHours" HeaderText="加班時數" />
+                                <asp:BoundField DataField="LeaveType" HeaderText="假別" />
+                                <asp:BoundField DataField="Remark" HeaderText="備註" />
+                            </Columns>
+
+                        </asp:GridView>
+
+                    </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="btnSearchAttendance" EventName="Click" />
+                    </Triggers>
+
+                </asp:UpdatePanel>
             </div>
 
         </div>
@@ -297,6 +369,8 @@
         新增員工
         </asp:HyperLink>
     </div>
+
+
     <!-- 重設密碼 Modal -->
     <div class="modal fade" id="resetPwdModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
