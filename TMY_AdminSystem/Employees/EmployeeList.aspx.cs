@@ -22,7 +22,43 @@ namespace TMY_AdminSystem.Employees
             {
                 LoadDepartments();
                 LoadProfileData(); // 載入個人資料
-                LoadSalaryDetail(1);
+                if (Session["UserID"] != null)
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    int salaryId = 0;
+
+                    using (SqlConnection conn = new SqlConnection(connStr))
+                    {
+                        string sql = @"
+            SELECT TOP 1 SalaryID
+            FROM SalaryRecords
+            WHERE EmployeeID = @emp
+            ORDER BY SalaryYear DESC, SalaryMonth DESC";
+
+                        SqlCommand cmd = new SqlCommand(sql, conn);
+                        cmd.Parameters.AddWithValue("@emp", userId);
+
+                        conn.Open();
+                        object result = cmd.ExecuteScalar();
+
+                        if (result != null)
+                        {
+                            salaryId = Convert.ToInt32(result);
+                        }
+                    }
+
+                    // 如果找到資料 → 載入薪資細項
+                    if (salaryId > 0)
+                    {
+                        LoadSalaryDetail(salaryId);
+                    }
+                    else
+                    {
+                        lblProfileMsg.Text = "⚠ 尚無薪資資料";
+                    }
+                }
+
+                //LoadSalaryDetail();
                 //預設載入員工資料，當此使用者擁有權限
                 BindEmployees();
                 LoadAttendance();
