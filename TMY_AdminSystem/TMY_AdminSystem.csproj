@@ -100,6 +100,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Announcements\AnnList.aspx" />
+    <Content Include="Announcements\AnnouncementAdd.aspx" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -188,6 +190,20 @@
     <Content Include="Site.Mobile.Master" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Announcements\AnnList.aspx.cs">
+      <DependentUpon>AnnList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Announcements\AnnList.aspx.designer.cs">
+      <DependentUpon>AnnList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Announcements\AnnouncementAdd.aspx.cs">
+      <DependentUpon>AnnouncementAdd.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Announcements\AnnouncementAdd.aspx.designer.cs">
+      <DependentUpon>AnnouncementAdd.aspx</DependentUpon>
+    </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
