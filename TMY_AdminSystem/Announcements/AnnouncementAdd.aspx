@@ -1,4 +1,5 @@
-﻿<%@ Page Title="公告管理" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="AnnouncementAdd.aspx.cs" Inherits="TMY_AdminSystem.Announcements.AnnouncementAdd" ValidateRequestMode="Disabled" %>
+﻿<%@ Page Title="公告管理" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="AnnouncementAdd.aspx.cs" Inherits="TMY_AdminSystem.Announcements.AnnouncementAdd" 
+    ValidateRequest="false" ValidateRequestMode="Disabled" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
@@ -35,28 +36,35 @@
                     <label class="form-label">公告分類</label>
                     <asp:DropDownList ID="ddlCategory" runat="server"
                         CssClass="form-select"
-                        DataTextField="CategoryName" DataValueField="CategoryID" />
+                        DataTextField="CategoryName" DataValueField="CategoryID" DataSourceID="SqlSource1" />
                     <asp:RequiredFieldValidator ID="rfvCategory" runat="server"
                         ControlToValidate="ddlCategory" ErrorMessage="請選擇公告分類。"
                         CssClass="text-danger" Display="Dynamic" InitialValue="" />
-                    
+                     <asp:SqlDataSource ID="SqlSource1" runat="server"
+                        ConnectionString="<%$ ConnectionStrings:TMY_DB %>"
+                        SelectCommand="SELECT CategoryID, CategoryName FROM AnnouncementCategories ORDER BY CategoryName">
+                      </asp:SqlDataSource>
                 </div>
 
+
                 <div class="col-md-4">
+                    <label class="form-label">發布方式</label>
+                    <br />
+                    <%-- 我們給 rblPublishMode 增加一個 CssClass="rblPublishMode" 讓 JavaScript 能夠找到它 --%>
+                    <asp:RadioButtonList ID="rblPublishMode" runat="server" RepeatDirection="Horizontal" CssClass="mt-2 rblPublishMode">
+                        <asp:ListItem Value="1" Selected="True"> 立即發布</asp:ListItem>
+                        <asp:ListItem Value="2" style="margin-left: 20px;"> 排程發布</asp:ListItem>
+                    </asp:RadioButtonList>
+                </div>
+
+                <div id="pnlPublishDate" class="col-md-4">
                     <label class="form-label">發布日期 (排程)</label>
                     <asp:TextBox ID="txtPublishDate" runat="server" CssClass="form-control" TextMode="DateTimeLocal" />
+                    
+                    <%-- 驗證器預設 Enabled="false"，由 JavaScript 根據 rblPublishMode 決定是否啟用 --%>
                     <asp:RequiredFieldValidator ID="rfvPublishDate" runat="server"
-                        ControlToValidate="txtPublishDate" ErrorMessage="請選擇發布日期。"
-                        CssClass="text-danger" Display="Dynamic" />
-                </div>
-                
-                <div class="col-md-4">
-                    <label class="form-label">發布狀態</label>
-                    <br />
-                    <asp:RadioButtonList ID="rblStatus" runat="server" RepeatDirection="Horizontal" CssClass="mt-2">
-                        <asp:ListItem Value="0" Selected="True"> 儲存草稿</asp:ListItem>
-                        <asp:ListItem Value="1" style="margin-left: 20px;"> 立即/排程發布</asp:ListItem>
-                    </asp:RadioButtonList>
+                        ControlToValidate="txtPublishDate" ErrorMessage="請選擇排程的發布日期。"
+                        CssClass="text-danger" Display="Dynamic" Enabled="false" ValidationGroup="PublishValidation" />
                 </div>
 
                 <div class="col-md-12">
@@ -119,16 +127,46 @@
 
         </div>
     </div>
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
-    <%-- 引用 CKEditor 的 JS --%>
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <%-- 步驟 2：【接著】才執行我們的啟動腳本 (和之前一樣) --%>
     <script type="text/javascript">
-        // 這會找到 ID 結尾為 'txtContent' 的元素並啟動 CKEditor
-        var contentTextBox = document.querySelector('[id$="txtContent"]');
-        if (contentTextBox) {
-            CKEDITOR.replace(contentTextBox.id);
+
+        // 建立一個函式來啟動編輯器
+        function initializeCKEditor() {
+            var contentTextBox = document.querySelector('[id$="txtContent"]');
+
+            // 檢查 1: 元素是否存在
+            // 檢查 2: 實例是否「尚未」建立
+            if (contentTextBox && !CKEDITOR.instances[contentTextBox.id]) {
+                CKEDITOR.replace(contentTextBox.id);
+            }
+        }
+
+        // --- 事件綁定 ---
+
+        // 1. 頁面【完全】載入後執行
+        //    (使用 "load" 事件，確保 ckeditor.js 已經下載完畢)
+        window.addEventListener("load", function () {
+            initializeCKEditor();
+        });
+
+        // 2. 處理 ASP.NET AJAX (UpdatePanel) PostBack
+        if (typeof (Sys) !== 'undefined') {
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+
+            prm.add_endRequest(function (sender, args) {
+
+                // (檢查並銷毀舊實例)
+                var existingInstance = CKEDITOR.instances[document.querySelector('[id$="txtContent"].id)]')];
+                if (existingInstance) {
+                    existingInstance.destroy();
+                }
+
+                // 重新建立
+                initializeCKEditor();
+            });
         }
     </script>
 </asp:Content>
-<asp:Content ID="Content3" ContentPlaceHolderID="Scripts" runat="server">
-</asp:Content>
+

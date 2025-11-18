@@ -87,6 +87,24 @@ namespace TMY_AdminSystem.Announcements
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvCategory;
 
         /// <summary>
+        /// SqlSource1 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.SqlDataSource SqlSource1;
+
+        /// <summary>
+        /// rblPublishMode 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList rblPublishMode;
+
+        /// <summary>
         /// txtPublishDate 控制項。
         /// </summary>
         /// <remarks>
@@ -103,15 +121,6 @@ namespace TMY_AdminSystem.Announcements
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPublishDate;
-
-        /// <summary>
-        /// rblStatus 控制項。
-        /// </summary>
-        /// <remarks>
-        /// 自動產生的欄位。
-        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList rblStatus;
 
         /// <summary>
         /// txtContent 控制項。

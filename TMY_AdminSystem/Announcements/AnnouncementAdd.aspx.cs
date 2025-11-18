@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace TMY_AdminSystem.Announcements
 {
     public partial class AnnouncementAdd : System.Web.UI.Page
     {
+        string connStr = ConfigurationManager.ConnectionStrings["TMY_DB"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -33,7 +35,7 @@ namespace TMY_AdminSystem.Announcements
 
                     // 設定預設值
                     txtPublishDate.Text = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
-                    rblStatus.SelectedValue = "0"; // 預設為草稿
+                    
                 }
             }
         }
@@ -88,17 +90,161 @@ namespace TMY_AdminSystem.Announcements
         //        rptAttachments.DataBind();
         //    }
         //}
+        protected void tempSave(bool isDraft)
+        {
+                //首先比對isDraft來決定status的值，接下來比對id看是否已經存在，是新增或update
+                int status;
+                DateTime publishDate;
 
+                if (isDraft)
+                {
+                    //草稿
+                    status = 0;
+                    if(rblPublishMode.SelectedValue == "2" && DateTime.TryParse(txtPublishDate.Text, out publishDate))
+                    {
+                        // 使用者已填排程日期
+                    }
+                    else
+                    {
+                        // 否則，使用今天日期 (或如果欄位中有值但格式不對，也用今天日期)
+                        if (!DateTime.TryParse(txtPublishDate.Text, out publishDate))
+                        {
+                            publishDate = DateTime.Now;
+                        }
+                    }
+                }
+                else
+                {
+                    status = Convert.ToInt32(rblPublishMode.SelectedValue);
+                    if (status == 1) // 立即發布
+                    {
+                        publishDate = DateTime.Now;
+                    }
+                    else // 2 = 排程發布
+                    {
+                        // 後端再次 double check
+                        if (!DateTime.TryParse(txtPublishDate.Text, out publishDate))
+                        {
+    
+                            return;
+                        }
+
+                        // 如果選了排程但時間在過去，就當作立即發布
+                        if (publishDate <= DateTime.Now)
+                        {
+                            status = 1;
+                            publishDate = DateTime.Now;
+                        }
+                    }
+                }
+
+                string sql = "";
+                string id = hdnAnnouncementID.Value;   
+                bool isNew = (id == "0");
+
+                if (isNew)
+                {
+                    // 新增模式: INSERT
+                    sql = @"INSERT INTO Announcements 
+                            (Title, Content, CategoryID, EmployeeID, Status, PublishDate, CreateDate, UpdateDate)
+                        VALUES 
+                            (@Title, @Content, @CategoryID, @EmployeeID, @Status, @PublishDate, GETDATE(), GETDATE());
+                        SELECT SCOPE_IDENTITY();"; // 返回新產生的 ID
+                }
+                else
+                {
+                    // 編輯模式: UPDATE
+                    sql = @"UPDATE Announcements SET
+                            Title = @Title,
+                            Content = @Content,
+                            CategoryID = @CategoryID,
+                            Status = @Status,
+                            PublishDate = @PublishDate,
+                            UpdateDate = GETDATE()
+                        WHERE 
+                            AnnouncementID = @ID";
+                }
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                    if (Session["UserID"] != null)
+                    {
+                        int authorID = Convert.ToInt32(Session["UserID"]);
+                    }
+                    
+                    else
+                    {
+                        ShowMessage("無法取得使用者資訊，請重新登入。", true);
+                        return;
+                    }
+                    
+
+                    // 抓取 CKEditor 的內容 (不能用 .Text 屬性)
+                    string editorContent = Request.Form[txtContent.UniqueID];
+
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+
+                    // 加入共用參數
+                    cmd.Parameters.AddWithValue("@Title", txtTitle.Text);
+                    cmd.Parameters.AddWithValue("@Content", editorContent);
+                    cmd.Parameters.AddWithValue("@CategoryID", ddlCategory.SelectedValue);
+                    cmd.Parameters.AddWithValue("@Status", status);
+                    cmd.Parameters.AddWithValue("@PublishDate", publishDate);
+
+                    if (isNew)
+                    {
+                        // 只在新增時加入作者 ID
+                        cmd.Parameters.AddWithValue("@EmployeeID", Session["UserID"]);
+
+                        // 執行並取得新 ID
+                        string newId = cmd.ExecuteScalar().ToString();
+                        hdnAnnouncementID.Value = newId; // 儲存後，將頁面更新為編輯模式
+                    }
+                    else
+                    {
+                        // 更新時指定 ID
+                        cmd.Parameters.AddWithValue("@ID", id);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // 1. 決定要顯示的訊息
+                    // (我幫您做了判斷，新增時顯示 "新增成功"，編輯時顯示 "更新成功")
+                    string alertMessage = isNew ? "新增成功" : "更新成功";
+
+                    // 2. 建立要執行的 JavaScript
+                    //    (顯示 alert，然後執行 client-side 轉跳)
+                    string script = $"alert('{alertMessage}'); window.location='AnnList.aspx';";
+
+                    // 3. 註冊腳本到頁面上
+                    Page.ClientScript.RegisterStartupScript(this.GetType(), "alertRedirect", script, true);
+
+                    // (已移除) Response.Redirect("AnnList.aspx");
+                }
+            } 
+
+        
+        private void ShowMessage(string message, bool isError)
+        {
+            // 尋找您在 .aspx 頁面上 ID="ValidationSummary1" 的那個控制項
+            if (ValidationSummary1 != null)
+            {
+                ValidationSummary1.HeaderText = message;
+                // 根據是否為錯誤，切換 Bootstrap 樣式
+                ValidationSummary1.CssClass = isError ? "alert alert-danger" : "alert alert-info";
+            }
+        }
         // 按下「儲存」按鈕
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            tempSave(false);
             // 在這裡，您需要撰寫「儲存」的 SQL 邏輯 (INSERT 或 UPDATE)
             // 1. 取得所有欄位的值 (txtTitle.Text, ddlCategory.SelectedValue, txtPublishDate.Text, rblStatus.SelectedValue, txtContent.Text)
             // 2. 取得登入者的 EmployeeID (例如: Session["EmployeeID"])
             // 3. 判斷 hdnAnnouncementID.Value 是 "0" (INSERT) 還是 > "0" (UPDATE)
             // 4. 執行 SQL
             // 5. 成功後導回列表頁
-            // Response.Redirect("AnnouncementList.aspx");
+            //Response.Redirect("AnnList.aspx");
         }
 
         // 按下「刪除公告」按鈕
@@ -161,7 +307,7 @@ namespace TMY_AdminSystem.Announcements
 
         protected void btnSaveDraft_Click(object sender, EventArgs e)
         {
-            Response.Redirect("AnnouncementList.aspx");
+            tempSave(true);
         }
     }
 }
