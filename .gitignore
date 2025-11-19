@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# 忽略真實的設定檔 (包含敏感資料)
+Web.config
+Web.Debug.config
+Web.Release.config
+
+# 但我們要保留範本檔
+!Web.config.template
