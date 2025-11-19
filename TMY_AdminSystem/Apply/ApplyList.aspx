@@ -73,8 +73,8 @@
                     </div>
 
                     <div class="col-md-6 text-end">
-                        <asp:Button ID="btnSearch" runat="server" Text="查詢"  CssClass="btn btn-primary px-4" />
-                        <asp:Button ID="btnClear" runat="server" Text="清除"  CssClass="btn btn-outline-secondary" />
+                        <asp:Button ID="btnSearch" runat="server" Text="查詢"  CssClass="btn btn-primary px-4" OnClick="btnSearch_Click"/>
+                        <asp:Button ID="btnClear" runat="server" Text="清除"  CssClass="btn btn-outline-secondary" OnClick="btnClear_Click"/>
                     </div>
 
                 </div>
@@ -102,7 +102,7 @@
                             <%-- 類別 (顯示 大類 - 小類) --%>
                             <asp:TemplateField HeaderText="類別">
                                 <ItemTemplate>
-                                    <small class="text-muted"><%# Eval("Category") %></small><br />
+                                    <small class="text-muted"><%# Eval("CategoryName") %></small><br />
                                     <%# Eval("TypeName") %>
                                 </ItemTemplate>
                             </asp:TemplateField>
@@ -111,7 +111,7 @@
                             <asp:TemplateField HeaderText="主旨" ItemStyle-CssClass="fw-bold">
                                 <ItemTemplate>
                                     <asp:HyperLink ID="lnkTitle" runat="server" 
-                                        NavigateUrl='<%# "ApplyDetail.aspx?ID=" + Eval("FormID") %>'
+                                        NavigateUrl='<%# "ApplyAdd.aspx?ID=" + Eval("FormID") %>'
                                         Text='<%# Eval("Title") %>' CssClass="text-decoration-none text-dark"></asp:HyperLink>
                                 </ItemTemplate>
                             </asp:TemplateField>
@@ -120,7 +120,7 @@
                             <asp:TemplateField HeaderText="申請人">
                                 <ItemTemplate>
                                     <div><%# Eval("ApplicantName") %></div>
-                                    <small class="text-muted"><%# Eval("DepartmentName") %></small>
+                                    <small class="text-muted"><%# Eval("DeptName") %></small>
                                 </ItemTemplate>
                             </asp:TemplateField>
 

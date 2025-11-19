@@ -6,8 +6,8 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h3 class="fw-bold mb-0">
-                <asp:Label ID="lblPageTitle" runat="server" Text="📝 填寫公文申請"></asp:Label>
+            <h3 class="fw-bold mb-3">
+                <asp:Label ID="lblPageTitle" runat="server" Text="填寫公文申請"></asp:Label>
             </h3>
             <asp:Label ID="lblFormNumber" runat="server" CssClass="text-muted small"></asp:Label>
         </div>
@@ -153,8 +153,8 @@
                     <div class="d-grid gap-2">
                         
                         <asp:Panel ID="pnlApplicantActions" runat="server">
-                            <asp:Button ID="btnSubmit" runat="server" Text="🚀 送出呈核" CssClass="btn btn-primary"  ValidationGroup="SubmitGroup" />
-                            <asp:Button ID="btnDraft" runat="server" Text="💾 儲存草稿" CssClass="btn btn-outline-secondary" CausesValidation="false" />
+                            <asp:Button ID="btnDraft" runat="server" Text="儲存草稿" CssClass="btn btn-primary"  ValidationGroup="SubmitGroup" OnClick="btnDraft_Click"/>
+                            <asp:Button ID="btnSubmit" runat="server" Text="送出呈核" CssClass="btn btn-outline-secondary" CausesValidation="false" OnClick="btnSubmit_Click" />
                         </asp:Panel>
 
                         <asp:Panel ID="pnlReviewerActions" runat="server" Visible="false">
