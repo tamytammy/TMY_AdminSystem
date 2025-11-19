@@ -208,15 +208,11 @@ namespace TMY_AdminSystem.Announcements
                         cmd.ExecuteNonQuery();
                     }
 
-                    // 1. 決定要顯示的訊息
-                    // (我幫您做了判斷，新增時顯示 "新增成功"，編輯時顯示 "更新成功")
+                    // 決定要顯示的訊息
                     string alertMessage = isNew ? "新增成功" : "更新成功";
 
-                    // 2. 建立要執行的 JavaScript
-                    //    (顯示 alert，然後執行 client-side 轉跳)
+                    // 顯示 alert，然後執行 client-side 轉跳
                     string script = $"alert('{alertMessage}'); window.location='AnnList.aspx';";
-
-                    // 3. 註冊腳本到頁面上
                     Page.ClientScript.RegisterStartupScript(this.GetType(), "alertRedirect", script, true);
 
                     // (已移除) Response.Redirect("AnnList.aspx");

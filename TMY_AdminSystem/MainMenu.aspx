@@ -34,7 +34,7 @@
                     <i class="fas fa-file-signature fa-3x text-success mb-3"></i>
                     <h5 class="card-title">公文審核申請</h5>
                     <p class="card-text text-muted">申請、審核、退回、紀錄與統計管理</p>
-                    <a href="./Application/ApplicationList.aspx" class="btn btn-success btn-sm">進入管理</a>
+                    <a href="./Apply/ApplyList.aspx" class="btn btn-success btn-sm">進入管理</a>
                 </div>
             </div>
         </div>

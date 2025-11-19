@@ -102,6 +102,8 @@
     <Content Include="About.aspx" />
     <Content Include="Announcements\AnnList.aspx" />
     <Content Include="Announcements\AnnouncementAdd.aspx" />
+    <Content Include="Apply\ApplyAdd.aspx" />
+    <Content Include="Apply\ApplyList.aspx" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -203,6 +205,20 @@
     </Compile>
     <Compile Include="Announcements\AnnouncementAdd.aspx.designer.cs">
       <DependentUpon>AnnouncementAdd.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Apply\ApplyAdd.aspx.cs">
+      <DependentUpon>ApplyAdd.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Apply\ApplyAdd.aspx.designer.cs">
+      <DependentUpon>ApplyAdd.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Apply\ApplyList.aspx.cs">
+      <DependentUpon>ApplyList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Apply\ApplyList.aspx.designer.cs">
+      <DependentUpon>ApplyList.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="About.aspx.cs">
