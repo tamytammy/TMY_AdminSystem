@@ -72,7 +72,7 @@
         <i class="fa fa-bullhorn"></i> 公告管理
             </asp:HyperLink>
 
-            <asp:HyperLink runat="server" NavigateUrl="~/Application/ApplicationList.aspx" CssClass="sidebar-link">
+            <asp:HyperLink runat="server" NavigateUrl="~/Apply/ApplyList.aspx" CssClass="sidebar-link">
         <i class="fas fa-file-signature"></i>公文審核申請
             </asp:HyperLink>
 
