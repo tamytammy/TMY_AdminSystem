@@ -121,7 +121,7 @@ namespace TMY_AdminSystem.Apply
         {
             // 1. 取得目前登入者資訊 (申請人)
             // ❗ 請確保 Session["UserID"] 有值，或做好例外處理
-            int applicantID = Convert.ToInt32(Session["UserID"]); // 預設 101 測試用
+            int applicantID = Convert.ToInt32(Session["UserID"]); 
 
             string applicantDeptID = "";
             int? managerID = null;

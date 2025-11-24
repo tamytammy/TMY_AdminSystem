@@ -145,6 +145,7 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
+        // ✅ 載入登入者的薪資資料
         private void LoadSalaryDetail(int salaryId)
         {
 
@@ -186,6 +187,7 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
+        // ✅ 載入登入者的出勤資料
         private void LoadAttendance()
         {
             string empId = Session["UserID"].ToString();
@@ -269,54 +271,81 @@ namespace TMY_AdminSystem.Employees
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
+                SqlTransaction transaction = conn.BeginTransaction();
 
-                // ✅ 先檢查是否已有資料
-                string checkSql = @"SELECT COUNT(*) FROM Employees WHERE EmployeeID = @id";
-                SqlCommand checkCmd = new SqlCommand(checkSql, conn);
-                checkCmd.Parameters.AddWithValue("@id", userId);
-
-                int count = (int)checkCmd.ExecuteScalar();
-
-                string sql;
-
-                if (count > 0)
+                try
                 {
-                    // ✅ 已有資料 → 執行 UPDATE
-                    sql = @"UPDATE Employees SET 
-                        FullName=@FullName,
-                        Email=@Email,
-                        DeptID=@DeptID,
-                        JobTitle=@JobTitle,
-                        JobGrade=@JobGrade,
-                        HireDate=@HireDate,
-                        Status=@Status,
-                        Role=@Role
-                    WHERE EmployeeID=@id";
+                    // 1. 檢查 Employees 表是否已有資料
+                    string checkSql = @"SELECT COUNT(*) FROM Employees WHERE EmployeeID = @id";
+                    SqlCommand checkCmd = new SqlCommand(checkSql, conn, transaction);
+                    checkCmd.Parameters.AddWithValue("@id", userId);
+                    int count = (int)checkCmd.ExecuteScalar();
+
+                    // 2. 準備共用參數
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.Transaction = transaction;
+
+                    cmd.Parameters.AddWithValue("@id", userId);
+                    cmd.Parameters.AddWithValue("@FullName", txtFullName.Text);
+                    cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
+                    cmd.Parameters.AddWithValue("@DeptID", ddlDept.SelectedValue);
+                    cmd.Parameters.AddWithValue("@JobTitle", txtJobTitle.Text);
+                    cmd.Parameters.AddWithValue("@JobGrade", txtJobGrade.Text);
+
+                    if (string.IsNullOrEmpty(txtHireDate.Text))
+                        cmd.Parameters.AddWithValue("@HireDate", DBNull.Value);
+                    else
+                        cmd.Parameters.AddWithValue("@HireDate", txtHireDate.Text);
+
+                    cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
+                    cmd.Parameters.AddWithValue("@Role", ddlRole.SelectedValue); // Users 用 (字串)
+
+                    // ✅ 新增：加入 RoleID 參數 (從新的 ddlRoleID 取值)
+                    cmd.Parameters.AddWithValue("@RoleID", ddlRoleID.SelectedValue);
+
+                    // 3. 處理 Employees 資料表
+                    if (count > 0)
+                    {
+                        // ✅ UPDATE Employees (補上 RoleID=@RoleID)
+                        cmd.CommandText = @"UPDATE Employees SET 
+                                    FullName=@FullName, Email=@Email, DeptID=@DeptID, 
+                                    JobTitle=@JobTitle, JobGrade=@JobGrade, HireDate=@HireDate, 
+                                    Status=@Status, Role=@Role, RoleID=@RoleID
+                                WHERE EmployeeID=@id";
+                        cmd.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        // ✅ INSERT Employees (補上 RoleID)
+                        cmd.CommandText = @"INSERT INTO Employees 
+                                    (EmployeeID, FullName, Email, DeptID, JobTitle, JobGrade, HireDate, Status, Role, RoleID, CreateTime)
+                                VALUES 
+                                    (@id, @FullName, @Email, @DeptID, @JobTitle, @JobGrade, @HireDate, @Status, @Role, @RoleID, GETDATE())";
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // 4. 同步更新 Users 資料表
+                    cmd.CommandText = @"UPDATE Users SET 
+                                Role=@Role, 
+                                Email=@Email 
+                            WHERE UserID=@id";
+                    cmd.ExecuteNonQuery();
+
+                    // 5. 提交
+                    transaction.Commit();
+                    lblProfileMsg.Text = "✅ 資料儲存成功！";
                 }
-                else
+                catch (Exception ex)
                 {
-                    // ✅ 尚未有資料 → 執行 INSERT
-                    sql = @"INSERT INTO Employees 
-                        (EmployeeID, FullName, Email, DeptID, JobTitle, JobGrade, HireDate, Status, Role, CreateTime)
-                    VALUES 
-                        (@id, @FullName, @Email, @DeptID, @JobTitle, @JobGrade, @HireDate, @Status, @Role, GETDATE())";
+                    transaction.Rollback();
+                    lblProfileMsg.Text = "❌ 儲存失敗：" + ex.Message;
                 }
-
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@id", userId);
-                cmd.Parameters.AddWithValue("@FullName", txtFullName.Text);
-                cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
-                cmd.Parameters.AddWithValue("@DeptID", ddlDept.SelectedValue);
-                cmd.Parameters.AddWithValue("@JobTitle", txtJobTitle.Text);
-                cmd.Parameters.AddWithValue("@JobGrade", txtJobGrade.Text);
-                cmd.Parameters.AddWithValue("@HireDate", txtHireDate.Text == "" ? (object)DBNull.Value : txtHireDate.Text);
-                cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
-                cmd.Parameters.AddWithValue("@Role", ddlRole.SelectedValue);
-
-                cmd.ExecuteNonQuery();
-                conn.Close();
+                finally
+                {
+                    conn.Close();
+                }
             }
-
             lblProfileMsg.Text = "✅ 個人資料更新成功！";
         }
 
@@ -521,6 +550,40 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
+
+        //新增帳號權限下拉選單
+        protected void ddlRole_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // 1. 先清空職級選單
+            ddlRoleID.Items.Clear();
+
+            // 2. 根據選擇的角色群組，填入對應的職級 ID
+            string selectedRole = ddlRole.SelectedValue;
+
+            switch (selectedRole)
+            {
+                case "User":
+                    // User 對應 RoleID 1
+                    ddlRoleID.Items.Add(new ListItem("一般員工", "1"));
+                    break;
+
+                case "Manager":
+                    // Manager 對應 RoleID 2, 3
+                    ddlRoleID.Items.Add(new ListItem("部門主任", "2"));
+                    ddlRoleID.Items.Add(new ListItem("部門經理", "3"));
+                    break;
+
+                case "Admin":
+                    // Admin 對應 RoleID 4, 5 (雖然您說通常不設置，但預留著比較保險)
+                    ddlRoleID.Items.Add(new ListItem("總經理 (Rank 4)", "4"));
+                    ddlRoleID.Items.Add(new ListItem("董事長 (Rank 5)", "5"));
+                    break;
+
+                default:
+                    ddlRoleID.Items.Add(new ListItem("一般員工 (Rank 1)", "1"));
+                    break;
+            }
+        }
 
 
 

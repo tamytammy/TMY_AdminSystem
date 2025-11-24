@@ -150,6 +150,15 @@ namespace TMY_AdminSystem.Employees
         protected global::System.Web.UI.WebControls.DropDownList DropDownList2;
 
         /// <summary>
+        /// upRole 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel upRole;
+
+        /// <summary>
         /// ddlRole 控制項。
         /// </summary>
         /// <remarks>
@@ -157,6 +166,15 @@ namespace TMY_AdminSystem.Employees
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlRole;
+
+        /// <summary>
+        /// ddlRoleID 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlRoleID;
 
         /// <summary>
         /// btnSaveProfile 控制項。

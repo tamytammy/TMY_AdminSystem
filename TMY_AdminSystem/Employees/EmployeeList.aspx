@@ -161,14 +161,32 @@
             </asp:DropDownList>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">角色 / 權限</label>
-            <asp:DropDownList ID="ddlRole" runat="server" CssClass="form-select">
-                <asp:ListItem Value="User">一般員工</asp:ListItem>
-                <asp:ListItem Value="Manager">部門主管</asp:ListItem>
-                <asp:ListItem Value="Admin">系統管理者</asp:ListItem>
-            </asp:DropDownList>
-        </div>
+        <asp:UpdatePanel ID="upRole" runat="server" UpdateMode="Conditional">
+            <ContentTemplate>
+                <div class="row g-2">
+
+                    <div class="col-md-6">
+                        <label class="form-label">帳號權限</label>
+                        <asp:DropDownList ID="ddlRole" runat="server" CssClass="form-select"
+                            AutoPostBack="true"
+                            OnSelectedIndexChanged="ddlRole_SelectedIndexChanged">
+                            <asp:ListItem Value="User">一般員工</asp:ListItem>
+                            <asp:ListItem Value="Manager">部門主管</asp:ListItem>
+                            <asp:ListItem Value="Admin">系統管理者</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">對應職級</label>
+                        <asp:DropDownList ID="ddlRoleID" runat="server" CssClass="form-select">
+                            <%-- 預設值，後端會動態改變這裡 --%>
+                            <asp:ListItem Value="1">一般員工</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                </div>
+            </ContentTemplate>
+        </asp:UpdatePanel>
 
         <div class="col-12 d-grid mt-3">
             <asp:Button ID="btnSaveProfile" runat="server" CssClass="btn btn-primary" Text="💾 儲存資料" OnClick="btnSaveProfile_Click" />
