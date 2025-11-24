@@ -21,7 +21,8 @@ namespace TMY_AdminSystem.Employees
             if (!IsPostBack)
             {
                 LoadDepartments();
-                LoadProfileData(); 
+                LoadProfileData();
+                BindLatestNews();
                 if (Session["UserID"] != null)
                 {
                     int userId = Convert.ToInt32(Session["UserID"]);
@@ -585,7 +586,94 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
+        //最新公告清單
+        /// <summary>
+        /// 1. 綁定最新公告列表 (Top 5)
+        /// </summary>
+        private void BindLatestNews()
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                // 邏輯：只抓 Status=1 (已發布) 且 日期 <= 今天 (非未來排程)
+                string sql = @"SELECT TOP 5 
+                                A.AnnouncementID, A.Title, A.PublishDate, C.CategoryName 
+                               FROM Announcements A
+                               LEFT JOIN AnnouncementCategories C ON A.CategoryID = C.CategoryID
+                               WHERE A.Status = 1 AND A.PublishDate <= GETDATE()
+                               ORDER BY A.PublishDate DESC";
 
+                SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                rptLatestNews.DataSource = dt;
+                rptLatestNews.DataBind();
+            }
+        }
+
+        /// <summary>
+        /// 2. 點擊公告標題 -> 載入詳情 -> 彈出視窗
+        /// </summary>
+        protected void rptLatestNews_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "View")
+            {
+                string announcementID = e.CommandArgument.ToString();
+                LoadNewsDetail(announcementID);
+
+                // 使用 ScriptManager 呼叫前端 JS 開啟 Modal (因為在 UpdatePanel 內)
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "openNewsModal();", true);
+            }
+        }
+
+        /// <summary>
+        /// 載入單一公告詳情與附件
+        /// </summary>
+        private void LoadNewsDetail(string id)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                // A. 查詢公告本體
+                string sqlInfo = @"SELECT A.Title, A.Content, A.PublishDate, C.CategoryName 
+                                   FROM Announcements A
+                                   LEFT JOIN AnnouncementCategories C ON A.CategoryID = C.CategoryID
+                                   WHERE A.AnnouncementID = @ID";
+                SqlCommand cmd = new SqlCommand(sqlInfo, conn);
+                cmd.Parameters.AddWithValue("@ID", id);
+
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                {
+                    lblModalTitle.Text = dr["Title"].ToString();
+                    lblModalDate.Text = Convert.ToDateTime(dr["PublishDate"]).ToString("yyyy/MM/dd HH:mm");
+                    lblModalCategory.Text = dr["CategoryName"].ToString();
+                    litModalContent.Text = dr["Content"].ToString(); // 顯示 HTML 內容
+                }
+                dr.Close();
+
+                // B. 查詢附件
+                string sqlAttach = "SELECT FileName, FilePath FROM AnnouncementAttachments WHERE AnnouncementID = @ID";
+                SqlCommand cmdAttach = new SqlCommand(sqlAttach, conn);
+                cmdAttach.Parameters.AddWithValue("@ID", id);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmdAttach);
+                DataTable dtAttach = new DataTable();
+                da.Fill(dtAttach);
+
+                if (dtAttach.Rows.Count > 0)
+                {
+                    pnlAttachments.Visible = true;
+                    rptModalAttachments.DataSource = dtAttach;
+                    rptModalAttachments.DataBind();
+                }
+                else
+                {
+                    pnlAttachments.Visible = false;
+                }
+            }
+        }
 
 
     }

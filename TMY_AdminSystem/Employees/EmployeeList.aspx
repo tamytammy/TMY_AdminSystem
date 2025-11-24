@@ -9,11 +9,82 @@
     <!-- 📢 最新公告區 -->
     <div class="alert alert-info shadow-sm mb-4" role="alert">
         <h5 class="alert-heading">📌 最新公告</h5>
-        <ul class="mb-0">
-            <li>【系統維護】本系統將於 11/10 (五) 18:00 - 20:00 進行維護，期間暫停服務。</li>
-            <li>【人事公告】2024 年度特休天數已重置，請至個人資料頁確認。</li>
-            <li>【薪資提醒】本月薪資將於 11/5 入帳，請留意銀行通知。</li>
-        </ul>
+        <asp:UpdatePanel ID="upNews" runat="server" UpdateMode="Conditional" ChildrenAsTriggers="true">
+            <ContentTemplate>
+
+                <div class="" role="alert">
+                   
+
+                    <ul class="mb-0 ps-3">
+                        <asp:Repeater ID="rptLatestNews" runat="server" OnItemCommand="rptLatestNews_ItemCommand">
+                            <ItemTemplate>
+                                <li class="mb-1">
+                                    <%-- 點擊標題觸發 ItemCommand (View) --%>
+                                    <asp:LinkButton ID="lnkNews" runat="server"
+                                        CommandName="View"
+                                        CommandArgument='<%# Eval("AnnouncementID") %>'
+                                        CssClass="text-decoration-none text-dark link-primary">
+                                
+                                        <%-- 格式：【分類】2025-10-27 標題 --%>
+                                        <span class="fw-bold text-primary">【<%# Eval("CategoryName") %>】</span>
+                                        <small class="text-muted ms-1"><%# Eval("PublishDate", "{0:yyyy-MM-dd}") %></small>
+                                        <span class="fw-bold"> <%# Eval("Title") %></span>
+                               
+                                
+                            </asp:LinkButton>
+                                </li>
+                            </ItemTemplate>
+                            <FooterTemplate>
+                                <%-- 如果沒有資料顯示這行 --%>
+                                <asp:Label ID="lblEmpty" runat="server" Visible='<%# rptLatestNews.Items.Count == 0 %>' Text="目前沒有最新公告。" CssClass="text-muted"></asp:Label>
+                            </FooterTemplate>
+                        </asp:Repeater>
+                    </ul>
+                </div>
+
+                <div class="modal fade" id="newsModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <asp:Label ID="lblModalTitle" runat="server"></asp:Label>
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex justify-content-between text-muted small mb-3 border-bottom pb-2">
+                                    <span><i class="fa-regular fa-calendar"></i>發布日期：<asp:Label ID="lblModalDate" runat="server"></asp:Label></span>
+                                    <span><i class="fa-solid fa-tag"></i>分類：<asp:Label ID="lblModalCategory" runat="server"></asp:Label></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <asp:Literal ID="litModalContent" runat="server"></asp:Literal>
+                                </div>
+
+                                <asp:Panel ID="pnlAttachments" runat="server" Visible="false">
+                                    <h6 class="fw-bold border-bottom pb-2"><i class="fa-solid fa-paperclip"></i>附件下載</h6>
+                                    <ul class="list-unstyled">
+                                        <asp:Repeater ID="rptModalAttachments" runat="server">
+                                            <ItemTemplate>
+                                                <li class="mb-2">
+                                                    <a href='<%# ResolveUrl(Eval("FilePath").ToString()) %>' target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="fa-solid fa-download"></i><%# Eval("FileName") %>
+                                            </a>
+                                                </li>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </ul>
+                                </asp:Panel>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </ContentTemplate>
+        </asp:UpdatePanel>
     </div>
     <!-- 🔍 查詢區塊 -->
     <asp:Panel runat="server" ID="member_pl" Visible="false">
@@ -397,5 +468,12 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+    function openNewsModal() {
+        var myModal = new bootstrap.Modal(document.getElementById('newsModal'));
+        myModal.show();
+    }
+</script>
 
 </asp:Content>

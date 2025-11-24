@@ -153,8 +153,8 @@
                     <div class="d-grid gap-2">
                         
                         <asp:Panel ID="pnlApplicantActions" runat="server">
-                            <asp:Button ID="btnDraft" runat="server" Text="儲存草稿" CssClass="btn btn-primary"  ValidationGroup="SubmitGroup" OnClick="btnDraft_Click"/>
-                            <asp:Button ID="btnSubmit" runat="server" Text="送出呈核" CssClass="btn btn-outline-secondary" CausesValidation="false" OnClick="btnSubmit_Click" />
+                            <asp:Button ID="btnDraft" runat="server" Text="儲存草稿" CssClass="btn btn-primary"   OnClick="btnDraft_Click" CausesValidation="false"/>
+                            <asp:Button ID="btnSubmit" runat="server" Text="送出呈核" CssClass="btn btn-outline-secondary"  ValidationGroup="SubmitGroup" OnClick="btnSubmit_Click" />
                         </asp:Panel>
 
                         <asp:Panel ID="pnlReviewerActions" runat="server" Visible="false">

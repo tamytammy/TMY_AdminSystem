@@ -36,10 +36,10 @@ namespace TMY_AdminSystem.Apply
         private void BindGrid()
         {
             // 1. 取得目前登入者資訊
-            // ❗ 務必確保 Session 有值，否則導回登入頁
+            // 務必確保 Session 有值，否則導回登入頁
             if (Session["UserID"] == null)
             {
-                // Response.Redirect("Login.aspx"); 
+                 Response.Redirect("Login.aspx");
                 return;
             }
 
@@ -47,7 +47,6 @@ namespace TMY_AdminSystem.Apply
             string myDeptID = "";
 
             // 先取得使用者的部門 ID (為了 "MyDept" 查詢用)
-            // 實務上建議登入時就存入 Session["DeptID"]，這裡示範從 DB 抓
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sqlUser = "SELECT DeptID FROM Employees WHERE EmployeeID = @ID";
