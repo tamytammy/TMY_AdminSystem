@@ -55,9 +55,9 @@
         <asp:Button ID="btnAddNew" runat="server" Text="＋ 新增公告" OnClick="btnAddNew_Click" CssClass="btn btn-success" CausesValidation="false" />
     </div>
 
-    <asp:UpdatePanel ID="upnlGridView" runat="server" UpdateMode="Conditional">
+<%--    <asp:UpdatePanel ID="upnlGridView" runat="server" UpdateMode="Conditional">
         <ContentTemplate>
-            
+            --%>
             <div class="card shadow-sm">
                 <div class="card-body p-0"> <%-- p-0 讓表格貼齊 card 邊緣 --%>
                     <asp:GridView ID="gvAnnouncements" runat="server"
@@ -86,7 +86,7 @@
 
                             <asp:BoundField DataField="AuthorName" HeaderText="發布者" SortExpression="AuthorName" ItemStyle-Width="120px" />
                             
-                            <asp:BoundField DataField="UpdateDate" HeaderText="最後更新" SortExpression="UpdateDate" DataFormatString="{0:yyyy/MM/dd HH:mm}" ItemStyle-Width="160px" />
+                            <asp:BoundField DataField="UpdateDate" HeaderText="最後更新" SortExpression="UpdateDate" DataFormatString="{0:yyyy/MM/dd}" ItemStyle-Width="160px" />
 
                             <asp:TemplateField HeaderText="操作" ItemStyle-Width="140px" ItemStyle-HorizontalAlign="Center">
                                 <ItemTemplate>
@@ -115,13 +115,13 @@
 
 
 
-        </ContentTemplate>
-        <Triggers>
+<%--        </ContentTemplate>
+        <Triggers>--%>
             <%-- 告訴 UpdatePanel，這兩個按鈕會觸發它更新 --%>
-            <asp:AsyncPostBackTrigger ControlID="btnSearch" EventName="Click" />
+<%--            <asp:AsyncPostBackTrigger ControlID="btnSearch" EventName="Click" />
             <asp:AsyncPostBackTrigger ControlID="btnClear" EventName="Click" />
         </Triggers>
-    </asp:UpdatePanel>
+    </asp:UpdatePanel>--%>
 
 
 

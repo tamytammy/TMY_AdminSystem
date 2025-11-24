@@ -25,7 +25,7 @@ namespace TMY_AdminSystem.Announcements
                     litPageTitle.Text = "編輯公告";
                     btnDelete.Visible = true; // 顯示刪除按鈕
 
-                    //LoadAnnouncementData(hdnAnnouncementID.Value);
+                    LoadAnnouncementData(hdnAnnouncementID.Value);
                 }
                 else
                 {
@@ -39,57 +39,57 @@ namespace TMY_AdminSystem.Announcements
                 }
             }
         }
-        //private void LoadAnnouncementData(string id)
-        //{
-        //    using (SqlConnection conn = new SqlConnection(connectionString))
-        //    {
-        //        string sql = "SELECT * FROM Announcements WHERE AnnouncementID = @ID";
-        //        SqlCommand cmd = new SqlCommand(sql, conn);
-        //        cmd.Parameters.AddWithValue("@ID", id);
+        private void LoadAnnouncementData(string id)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = "SELECT * FROM Announcements WHERE AnnouncementID = @ID";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@ID", id);
 
-        //        try
-        //        {
-        //            conn.Open();
-        //            SqlDataReader reader = cmd.ExecuteReader();
-        //            if (reader.Read())
-        //            {
-        //                txtTitle.Text = reader["Title"].ToString();
-        //                txtContent.Text = reader["Content"].ToString();
-        //                ddlCategory.SelectedValue = reader["CategoryID"].ToString();
-        //                rblStatus.SelectedValue = reader["Status"].ToString();
+                try
+                {
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        txtTitle.Text = reader["Title"].ToString();
+                        txtContent.Text = reader["Content"].ToString();
+                        ddlCategory.SelectedValue = reader["CategoryID"].ToString();
+                        //rblStatus.SelectedValue = reader["Status"].ToString();
 
-        //                // 格式化日期以符合 <input type="datetime-local">
-        //                DateTime publishDate = (DateTime)reader["PublishDate"];
-        //                txtPublishDate.Text = publishDate.ToString("yyyy-MM-ddTHH:mm");
+                        // 格式化日期以符合 <input type="datetime-local">
+                        DateTime publishDate = (DateTime)reader["PublishDate"];
+                        txtPublishDate.Text = publishDate.ToString("yyyy-MM-ddTHH:mm");
 
-        //                // (假設 AuthorEmployeeID 是從登入 Session 來的，這裡不用設定)
-        //            }
-        //            reader.Close();
+                        // (假設 AuthorEmployeeID 是從登入 Session 來的，這裡不用設定)
+                    }
+                    reader.Close();
 
-        //            // 載入附件
-        //            LoadAttachments(id);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            ValidationSummary1.HeaderText = "讀取資料時發生錯誤：" + ex.Message;
-        //        }
-        //    }
-        //}
+                    // 載入附件
+                    LoadAttachments(id);
+                }
+                catch (Exception ex)
+                {
+                    ValidationSummary1.HeaderText = "讀取資料時發生錯誤：" + ex.Message;
+                }
+            }
+        }
 
-        //private void LoadAttachments(string announcementID)
-        //{
-        //    using (SqlConnection conn = new SqlConnection(connectionString))
-        //    {
-        //        string sql = "SELECT AttachmentID, FileName, FilePath FROM AnnouncementAttachments WHERE AnnouncementID = @ID";
-        //        SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-        //        da.SelectCommand.Parameters.AddWithValue("@ID", announcementID);
-        //        DataTable dt = new DataTable();
-        //        da.Fill(dt);
+        private void LoadAttachments(string announcementID)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = "SELECT AttachmentID, FileName, FilePath FROM AnnouncementAttachments WHERE AnnouncementID = @ID";
+                SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+                da.SelectCommand.Parameters.AddWithValue("@ID", announcementID);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
 
-        //        rptAttachments.DataSource = dt;
-        //        rptAttachments.DataBind();
-        //    }
-        //}
+                rptAttachments.DataSource = dt;
+                rptAttachments.DataBind();
+            }
+        }
         protected void tempSave(bool isDraft)
         {
                 //首先比對isDraft來決定status的值，接下來比對id看是否已經存在，是新增或update

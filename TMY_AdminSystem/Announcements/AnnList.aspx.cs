@@ -5,14 +5,26 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Data;           // 解決 DataTable 錯誤
+using System.Data.SqlClient; // 解決 SqlConnection, SqlCommand 錯誤
+using System.Configuration;  // 解決 ConfigurationManager 錯誤
 
 namespace TMY_AdminSystem.Announcements
 {
     public partial class AnnList : System.Web.UI.Page
     {
+        string connStr = ConfigurationManager.ConnectionStrings["TMY_DB"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
-            // GridView 狀態轉換函式 (aspx 頁面中會呼叫)
+
+            if (!IsPostBack)
+            {
+                // 1. 綁定下拉選單
+                //BindCategories();
+
+                // 2. 【關鍵】第一次載入時，必須呼叫 BindGrid()
+                BindGrid();
+            }
         }
         public string FormatStatus(object statusObj)
         {
@@ -33,52 +45,14 @@ namespace TMY_AdminSystem.Announcements
         // 1. 查詢按鈕
         protected void btnSearch_Click(object sender, EventArgs e)
         {
-            // 這是動態產生 WHERE 條件的關鍵
-            StringBuilder whereClause = new StringBuilder();
-
-            // 1. 分類
-            if (ddlCategoryFilter.SelectedValue != "0" && !string.IsNullOrEmpty(ddlCategoryFilter.SelectedValue))
+            // 按下查詢時，回到第一頁
+            if (gvAnnouncements.AllowPaging)
             {
-                whereClause.AppendFormat(" AND (A.CategoryID = {0})", ddlCategoryFilter.SelectedValue);
+                gvAnnouncements.PageIndex = 0;
             }
 
-            // 2. 日期 (起)
-            if (!string.IsNullOrEmpty(txtDateStart.Text))
-            {
-                whereClause.AppendFormat(" AND (A.PublishDate >= '{0}')", txtDateStart.Text);
-            }
-
-            // 3. 日期 (迄)
-            if (!string.IsNullOrEmpty(txtDateEnd.Text))
-            {
-                // 包含當天，所以要到 23:59:59
-                whereClause.AppendFormat(" AND (A.PublishDate <= '{0} 23:59:59')", txtDateEnd.Text);
-            }
-
-            // 4. 關鍵字 (查詢標題或內容)
-            if (!string.IsNullOrEmpty(txtKeywordFilter.Text))
-            {
-                string keyword = txtKeywordFilter.Text.Trim().Replace("'", "''"); // 防止 SQL Injection
-                whereClause.AppendFormat(" AND (A.Title LIKE N'%{0}%' OR A.Content LIKE N'%{0}%')", keyword);
-            }
-
-            // 取得原始 SQL
-            string baseSql = @"
-                SELECT 
-                    A.AnnouncementID, A.Title, A.PublishDate, A.Status, A.UpdateDate, 
-                    C.CategoryName, E.EmployeeName AS AuthorName
-                FROM 
-                    Announcements AS A
-                INNER JOIN 
-                    AnnouncementCategories AS C ON A.CategoryID = C.CategoryID
-                LEFT JOIN 
-                    Employees AS E ON A.AuthorEmployeeID = E.EmployeeID
-                WHERE 1=1 "; // WHERE 1=1 方便後面串接 AND
-
-
-
-            // 重新綁定 GridView
-            gvAnnouncements.DataBind();
+            // 呼叫共用的查詢函式
+            BindGrid();
         }
 
         // 2. 清除條件按鈕
@@ -110,7 +84,7 @@ namespace TMY_AdminSystem.Announcements
             if (e.CommandName == "EditRow")
             {
                 // 導向到編輯頁面，並帶上 ID
-                Response.Redirect($"AnnouncementEdit.aspx?ID={announcementID}");
+                Response.Redirect($"AnnouncementAdd.aspx?ID={announcementID}");
             }
 
             if (e.CommandName == "DeleteRow")
@@ -135,5 +109,95 @@ namespace TMY_AdminSystem.Announcements
             }
         
     }
+
+        //5. 核心查詢
+        private void BindGrid()
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                // 1. 基礎 SQL (這跟您原本的一樣)
+                StringBuilder sql = new StringBuilder();
+                sql.Append(@"
+            SELECT 
+                A.AnnouncementID, A.Title, A.PublishDate, A.Status, A.UpdateDate, 
+                C.CategoryName, E.FullName AS AuthorName
+            FROM Announcements AS A
+            INNER JOIN AnnouncementCategories AS C ON A.CategoryID = C.CategoryID
+            LEFT JOIN Employees AS E ON A.EmployeeID = E.EmployeeID
+            WHERE A.Status <> 99 "); // 預設過濾已刪除
+
+                // 2. 動態加入條件 (改用參數化 @Param 寫法)
+
+                // [分類]
+                if (ddlCategoryFilter.SelectedValue != "0" && !string.IsNullOrEmpty(ddlCategoryFilter.SelectedValue))
+                {
+                    sql.Append(" AND A.CategoryID = @CategoryID ");
+                }
+
+                // [日期起]
+                if (!string.IsNullOrEmpty(txtDateStart.Text))
+                {
+                    sql.Append(" AND A.PublishDate >= @DateStart ");
+                }
+
+                // [日期迄]
+                if (!string.IsNullOrEmpty(txtDateEnd.Text))
+                {
+                    // 包含當天: < 隔天
+                    sql.Append(" AND A.PublishDate < DATEADD(day, 1, @DateEnd) ");
+                }
+
+                // [關鍵字]
+                if (!string.IsNullOrEmpty(txtKeywordFilter.Text.Trim()))
+                {
+                    sql.Append(" AND (A.Title LIKE @Keyword OR A.Content LIKE @Keyword) ");
+                }
+
+                // 3. 排序
+                sql.Append(" ORDER BY A.PublishDate DESC ");
+
+                // 4. 準備執行
+                SqlCommand cmd = new SqlCommand(sql.ToString(), conn);
+
+                // 5. 加入參數值 (與上面的 SQL 對應)
+                if (ddlCategoryFilter.SelectedValue != "0" && !string.IsNullOrEmpty(ddlCategoryFilter.SelectedValue))
+                    cmd.Parameters.AddWithValue("@CategoryID", ddlCategoryFilter.SelectedValue);
+
+                if (!string.IsNullOrEmpty(txtDateStart.Text))
+                    cmd.Parameters.AddWithValue("@DateStart", txtDateStart.Text);
+
+                if (!string.IsNullOrEmpty(txtDateEnd.Text))
+                    cmd.Parameters.AddWithValue("@DateEnd", txtDateEnd.Text);
+
+                if (!string.IsNullOrEmpty(txtKeywordFilter.Text.Trim()))
+                    cmd.Parameters.AddWithValue("@Keyword", "%" + txtKeywordFilter.Text.Trim() + "%");
+
+                try
+                {
+                    conn.Open();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    // 6. 綁定資料
+                    gvAnnouncements.DataSource = dt;
+                    gvAnnouncements.DataBind();
+                }
+                catch (Exception ex)
+                {
+                    // 錯誤處理
+                    // 先把錯誤訊息中的單引號 (') 和換行符號拿掉，避免 JavaScript 語法錯誤
+                    string cleanMessage = ex.Message.Replace("'", "").Replace("\r", "").Replace("\n", "");
+
+                    // 組合 JavaScript
+                    string script = $"alert('查詢發生錯誤：{cleanMessage}');";
+
+                    // 執行 Alert
+                    ClientScript.RegisterStartupScript(this.GetType(), "ErrorAlert", script, true);
+                }
+            }
+        }
+
+
     }
 }
