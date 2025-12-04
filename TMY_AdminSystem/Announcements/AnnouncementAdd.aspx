@@ -128,8 +128,6 @@
         </div>
     </div>
 <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-
-    <%-- 步驟 2：【接著】才執行我們的啟動腳本 (和之前一樣) --%>
     <script type="text/javascript">
 
         // 建立一個函式來啟動編輯器

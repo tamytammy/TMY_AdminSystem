@@ -587,9 +587,6 @@ namespace TMY_AdminSystem.Employees
         }
 
         //最新公告清單
-        /// <summary>
-        /// 1. 綁定最新公告列表 (Top 5)
-        /// </summary>
         private void BindLatestNews()
         {
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -612,7 +609,7 @@ namespace TMY_AdminSystem.Employees
         }
 
         /// <summary>
-        /// 2. 點擊公告標題 -> 載入詳情 -> 彈出視窗
+        /// 點擊公告標題 -> 載入詳情 -> 彈出視窗
         /// </summary>
         protected void rptLatestNews_ItemCommand(object source, RepeaterCommandEventArgs e)
         {

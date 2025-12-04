@@ -71,22 +71,22 @@
                         OnRowCommand="gvAnnouncements_RowCommand" >
                         
                         <Columns>
-                            <asp:BoundField DataField="Title" HeaderText="標題" SortExpression="Title" />
+                            <asp:BoundField DataField="Title" HeaderText="標題"  HeaderStyle-HorizontalAlign="Center"/>
                             
-                            <asp:BoundField DataField="CategoryName" HeaderText="分類" SortExpression="CategoryName" ItemStyle-Width="120px" />
+                            <asp:BoundField DataField="CategoryName" HeaderText="分類" ItemStyle-Width="120px" />
                             
-                            <asp:BoundField DataField="PublishDate" HeaderText="發布日期" SortExpression="PublishDate" DataFormatString="{0:yyyy/MM/dd}" ItemStyle-Width="120px" />
+                            <asp:BoundField DataField="PublishDate" HeaderText="發布日期"  DataFormatString="{0:yyyy/MM/dd}" ItemStyle-Width="120px" />
                             
-                            <asp:TemplateField HeaderText="狀態" SortExpression="Status" ItemStyle-Width="100px" ItemStyle-HorizontalAlign="Center">
+                            <asp:TemplateField HeaderText="狀態" ItemStyle-Width="100px" ItemStyle-HorizontalAlign="Center">
                                 <ItemTemplate>
                                     <%-- 後端 C# 函式會回傳 Bootstrap Badge 樣式 --%>
                                     <%# FormatStatus(Eval("Status")) %>
                                 </ItemTemplate>
                             </asp:TemplateField>
 
-                            <asp:BoundField DataField="AuthorName" HeaderText="發布者" SortExpression="AuthorName" ItemStyle-Width="120px" />
+                            <asp:BoundField DataField="AuthorName" HeaderText="發布者"  ItemStyle-Width="120px" />
                             
-                            <asp:BoundField DataField="UpdateDate" HeaderText="最後更新" SortExpression="UpdateDate" DataFormatString="{0:yyyy/MM/dd}" ItemStyle-Width="160px" />
+                            <asp:BoundField DataField="UpdateDate" HeaderText="最後更新"  DataFormatString="{0:yyyy/MM/dd}" ItemStyle-Width="160px" />
 
                             <asp:TemplateField HeaderText="操作" ItemStyle-Width="140px" ItemStyle-HorizontalAlign="Center">
                                 <ItemTemplate>
