@@ -23,6 +23,9 @@ namespace TMY_AdminSystem.Employees
                 LoadDepartments();
                 LoadProfileData();
                 BindLatestNews();
+
+
+                //預設載入最新薪資資料
                 if (Session["UserID"] != null)
                 {
                     int userId = Convert.ToInt32(Session["UserID"]);
@@ -61,13 +64,26 @@ namespace TMY_AdminSystem.Employees
 
 
                 //預設載入員工資料，當此使用者擁有權限
+                //目前只有寫admin還沒有限制manager
                 BindEmployees();
+
+               //預設載入個人出勤資料
                 LoadAttendance();
 
-                if(Session["UserRole"] != null && Session["UserRole"].ToString() == "Admin")
+                if(Session["UserRole"] != null)
                 {
+                    if (Session["UserRole"].ToString() == "Admin" || Session["UserRole"].ToString() == "Manager")
                     member_pl.Visible = true;
                     lnkAddEmployee.Visible = true;
+                    if (Session["UserRole"].ToString() == "Manager")
+                    {
+                        ddlDept2.Enabled = false;
+                        if (ddlDept2.Items.FindByValue(Session["DeptID"].ToString()) != null)
+                        {
+                            ddlDept2.SelectedValue = Session["DeptID"].ToString();
+                        }
+                    }
+
                 }
             }
         }
@@ -93,6 +109,7 @@ namespace TMY_AdminSystem.Employees
             if (currentDeptId.HasValue)
             {
                 ddlDept.SelectedValue = currentDeptId.Value.ToString();
+                Session["DeptID"] = currentDeptId.Value.ToString();
             }
             else
             {
@@ -102,7 +119,7 @@ namespace TMY_AdminSystem.Employees
         }
 
 
-        // ✅ 載入登入者的 Employee 資料
+        // 載入登入者的 Employee 資料
         private void LoadProfileData()
         {
             int userId = Convert.ToInt32(Session["UserID"]);
@@ -146,7 +163,7 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
-        // ✅ 載入登入者的薪資資料
+        // 載入登入者的薪資資料
         private void LoadSalaryDetail(int salaryId)
         {
 
@@ -188,7 +205,7 @@ namespace TMY_AdminSystem.Employees
             }
         }
 
-        // ✅ 載入登入者的出勤資料
+        // 載入登入者的出勤資料
         private void LoadAttendance()
         {
             string empId = Session["UserID"].ToString();
@@ -229,7 +246,7 @@ namespace TMY_AdminSystem.Employees
 
 
 
-        // ✅ 儲存更新資料
+        // 儲存更新資料
         protected void btnSaveProfile_Click(object sender, EventArgs e)
         {
             int userId = Convert.ToInt32(Session["UserID"]);
@@ -299,7 +316,7 @@ namespace TMY_AdminSystem.Employees
                     else
                         cmd.Parameters.AddWithValue("@HireDate", txtHireDate.Text);
 
-                    cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
+                    cmd.Parameters.AddWithValue("@Status", ddlStatus2.SelectedValue);
                     cmd.Parameters.AddWithValue("@Role", ddlRole.SelectedValue); // Users 用 (字串)
 
                     // ✅ 新增：加入 RoleID 參數 (從新的 ddlRoleID 取值)
@@ -322,7 +339,7 @@ namespace TMY_AdminSystem.Employees
                         cmd.CommandText = @"INSERT INTO Employees 
                                     (EmployeeID, FullName, Email, DeptID, JobTitle, JobGrade, HireDate, Status, Role, RoleID, CreateTime)
                                 VALUES 
-                                    (@id, @FullName, @Email, @DeptID, @JobTitle, @JobGrade, @HireDate, @Status, @Role, @RoleID, GETDATE())";
+                                    (@id, @FullName, @Email, @DeptID, @JobTitle, @JobGrade, @HireDate, '1', @Role, @RoleID, GETDATE())";
                         cmd.ExecuteNonQuery();
                     }
 
@@ -436,14 +453,61 @@ namespace TMY_AdminSystem.Employees
         {
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = @"
+
+                StringBuilder sql = new StringBuilder();
+                sql.Append(@"
             SELECT E.EmployeeID, E.FullName, E.Email, D.DeptName, 
-                   E.JobTitle, E.JobGrade, E.HireDate
+                   E.JobTitle, E.JobGrade, E.HireDate, E.Status
             FROM Employees E
             LEFT JOIN Departments D ON E.DeptID = D.DeptID
-        ";
+            WHERE 1=1 
+        ");
 
-                SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+
+
+
+                //關鍵字搜尋(限制姓名、員工編號)
+                string keyword = txtKeyword.Text.Trim();
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    sql.Append(" AND (E.FullName LIKE @Keyword OR CAST(E.EmployeeID AS NVARCHAR) LIKE @Keyword) ");
+                    cmd.Parameters.AddWithValue("@Keyword", "%" + keyword + "%");
+                }
+
+                if (Session["UserRole"].ToString() == "Admin")
+                {
+                    //系統管理者可以檢視所有部門資料、不鎖定部門下拉選單
+                    if (!string.IsNullOrEmpty(ddlDept2.SelectedValue) && ddlDept2.SelectedValue != "0")
+                    {
+                        sql.Append(" AND E.DeptID = @SearchDeptID ");
+                        cmd.Parameters.AddWithValue("@SearchDeptID", ddlDept2.SelectedValue);
+                    }
+                }
+                else
+                {
+                    //如果是部門經理，則鎖定只能查看自己部門的員工資料
+                    sql.Append(" AND E.DeptID = @MyDeptID ");
+                    cmd.Parameters.AddWithValue("@MyDeptID", Session["DeptID"].ToString());
+                }
+
+
+
+                //在職狀態篩選
+                if (!string.IsNullOrEmpty(ddlStatus.SelectedValue))
+                {
+                    sql.Append(" AND E.Status = @Status ");
+                    cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
+                }
+
+
+                sql.Append(" ORDER BY E.EmployeeID ASC ");
+
+                cmd.CommandText = sql.ToString();
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 

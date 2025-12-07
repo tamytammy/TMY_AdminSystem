@@ -98,18 +98,18 @@
 
                     <div class="col-md-3">
                         <asp:DropDownList ID="ddlDept2" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">全部部門</asp:ListItem>
-                            <asp:ListItem Value="HR">人資部</asp:ListItem>
-                            <asp:ListItem Value="IT">資訊部</asp:ListItem>
-                            <asp:ListItem Value="RD">研發部</asp:ListItem>
+                            <asp:ListItem Value="0">全部部門</asp:ListItem>
+                            <asp:ListItem Value="1">人資部</asp:ListItem>
+                            <asp:ListItem Value="2">資訊部</asp:ListItem>
+                            <asp:ListItem Value="3">研發部</asp:ListItem>
                         </asp:DropDownList>
                     </div>
 
                     <div class="col-md-3">
                         <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select">
                             <asp:ListItem Value="">全部在職狀態</asp:ListItem>
-                            <asp:ListItem Value="On">在職</asp:ListItem>
-                            <asp:ListItem Value="Leave">離職</asp:ListItem>
+                            <asp:ListItem Value="1">在職</asp:ListItem>
+                            <asp:ListItem Value="0">離職</asp:ListItem>
                         </asp:DropDownList>
                     </div>
 
@@ -226,9 +226,9 @@
 
         <div class="col-md-4">
             <label class="form-label">在職狀態</label>
-            <asp:DropDownList ID="DropDownList2" runat="server" CssClass="form-select">
-                <asp:ListItem Value="On">在職</asp:ListItem>
-                <asp:ListItem Value="Leave">離職</asp:ListItem>
+            <asp:DropDownList ID="ddlStatus2" runat="server" CssClass="form-select">
+                <asp:ListItem Value="1">在職</asp:ListItem>
+                <asp:ListItem Value="0">離職</asp:ListItem>
             </asp:DropDownList>
         </div>
 
@@ -294,7 +294,7 @@
                                         <asp:ListItem Value="2">2</asp:ListItem>
                                         <asp:ListItem Value="3">3</asp:ListItem>
                                         <asp:ListItem Value="4">4</asp:ListItem>
-                                        <asp:ListItem Value="5">6</asp:ListItem>
+                                        <asp:ListItem Value="5">5</asp:ListItem>
                                         <asp:ListItem Value="6">6</asp:ListItem>
                                         <asp:ListItem Value="7">7</asp:ListItem>
                                         <asp:ListItem Value="8">8</asp:ListItem>

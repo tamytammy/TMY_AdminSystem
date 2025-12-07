@@ -42,11 +42,11 @@
             <asp:Button ID="btnLogin" runat="server" Text="登入"
                 CssClass="btn btn-primary w-100" OnClick="btnLogin_Click" />
 
-            <% remove register link %>
+            <%--<% remove register link %>
             <div class="text-center mt-3">
                 <a href="Register.aspx" class="small">還沒有帳號？前往註冊</a>
             </div>
-            <% remove register link %>
+            --%>
         </div>
     </form>
 </body>
