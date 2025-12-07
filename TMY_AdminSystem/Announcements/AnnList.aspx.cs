@@ -27,9 +27,7 @@ namespace TMY_AdminSystem.Announcements
             }
         }
 
-        /// <summary>
-        /// 綁定「公告分類」下拉選單
-        /// </summary>
+        // 綁定「公告分類」下拉選單
         private void BindCategories()
         {
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -70,7 +68,7 @@ namespace TMY_AdminSystem.Announcements
             }
         }
 
-        // 1. 查詢按鈕
+        // 查詢按鈕
         protected void btnSearch_Click(object sender, EventArgs e)
         {
             // 按下查詢時，回到第一頁
@@ -83,7 +81,7 @@ namespace TMY_AdminSystem.Announcements
             BindGrid();
         }
 
-        // 2. 清除條件按鈕
+        // 清除條件按鈕
         protected void btnClear_Click(object sender, EventArgs e)
         {
             // 還原所有查詢控制項
@@ -96,14 +94,14 @@ namespace TMY_AdminSystem.Announcements
             btnSearch_Click(sender, e); // 重新執行一次查詢 (此時所有條件都為空)
         }
 
-        // 3. 新增公告按鈕
+        // 新增公告按鈕
         protected void btnAddNew_Click(object sender, EventArgs e)
         {
             // 導向到「新增/編輯」頁面 (我們假設叫做 AnnouncementEdit.aspx)
             Response.Redirect("AnnouncementAdd.aspx");
         }
 
-        // 4. GridView 的操作按鈕 (編輯/刪除)
+        // GridView 的操作按鈕 (編輯/刪除)
         protected void gvAnnouncements_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             // 取得被點擊的 Row 的 AnnouncementID
@@ -117,28 +115,36 @@ namespace TMY_AdminSystem.Announcements
 
             if (e.CommandName == "DeleteRow")
             {
-                // 執行刪除 (建議使用軟刪除 Soft Delete，例如更新 Status = 99)
-                // 這裡我們先用 SqlDataSource 來執行 Delete
-                // (您需要先在 SqlDataSourceAnnouncements 中定義 DeleteCommand)
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    // 執行硬刪除：直接從資料庫移除
+                    // 如果資料庫有設定 FK 的 ON DELETE CASCADE，附件會自動消失
+                    string sql = "DELETE FROM Announcements WHERE AnnouncementID = @ID";
 
-                /*
-                // 範例：定義 DeleteCommand
-                SqlDataSourceAnnouncements.DeleteCommand = "UPDATE Announcements SET Status = 99 WHERE AnnouncementID = @AnnouncementID";
-                SqlDataSourceAnnouncements.DeleteParameters.Clear();
-                SqlDataSourceAnnouncements.DeleteParameters.Add("AnnouncementID", announcementID.ToString());
-                SqlDataSourceAnnouncements.Delete();
-                */
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@ID", announcementID);
 
-                // 暫時先提示 (因為我們還沒實作刪除)
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "alert", $"alert('執行刪除 ID: {announcementID}。請實作刪除邏輯。');", true);
+                    try
+                    {
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        // 處理 FK 衝突錯誤 (如果沒設 Cascade Delete，這裡會報錯)
+                         ClientScript.RegisterStartupScript(this.GetType(), "alert", $"alert('刪除失敗，可能尚有相關聯的附件未移除: {ex.Message}');", true);
+                    }
+                }
 
                 // 重新綁定 GridView
-                gvAnnouncements.DataBind();
+                BindGrid();
+                // 重新綁定 GridView
+                // gvAnnouncements.DataBind();
             }
         
     }
 
-        //5. 核心查詢
+        //核心查詢
         private void BindGrid()
         {
             using (SqlConnection conn = new SqlConnection(connStr))
