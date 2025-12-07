@@ -20,10 +20,38 @@ namespace TMY_AdminSystem.Announcements
             if (!IsPostBack)
             {
                 // 1. 綁定下拉選單
-                //BindCategories();
+                BindCategories();
 
                 // 2. 【關鍵】第一次載入時，必須呼叫 BindGrid()
                 BindGrid();
+            }
+        }
+
+        /// <summary>
+        /// 綁定「公告分類」下拉選單
+        /// </summary>
+        private void BindCategories()
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                // 您的 SQL 語法 (我加入了排序，讓選單比較整齊)
+                string sql = "SELECT CategoryID, CategoryName FROM AnnouncementCategories ORDER BY CategoryID";
+
+                    conn.Open();
+                    SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    // 設定資料來源
+                    ddlCategoryFilter.DataSource = dt;
+
+                    // 設定顯示文字 (CategoryName) 與 對應的值 (CategoryID)
+                    ddlCategoryFilter.DataTextField = "CategoryName";
+                    ddlCategoryFilter.DataValueField = "CategoryID";
+
+                    // 執行綁定
+                    // 因為前端設有 AppendDataBoundItems="true"，資料會接在 "--- 全部分類 ---" 後面
+                    ddlCategoryFilter.DataBind();
             }
         }
         public string FormatStatus(object statusObj)

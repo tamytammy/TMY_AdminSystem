@@ -73,16 +73,20 @@ namespace TMY_AdminSystem.Employees
                 if(Session["UserRole"] != null)
                 {
                     if (Session["UserRole"].ToString() == "Admin" || Session["UserRole"].ToString() == "Manager")
-                    member_pl.Visible = true;
-                    lnkAddEmployee.Visible = true;
-                    if (Session["UserRole"].ToString() == "Manager")
                     {
-                        ddlDept2.Enabled = false;
-                        if (ddlDept2.Items.FindByValue(Session["DeptID"].ToString()) != null)
+                        member_pl.Visible = true;
+                        lnkAddEmployee.Visible = true;
+                        if (Session["UserRole"].ToString() == "Manager")
                         {
-                            ddlDept2.SelectedValue = Session["DeptID"].ToString();
+                            ddlDept2.Enabled = false;
+                            if (ddlDept2.Items.FindByValue(Session["DeptID"].ToString()) != null)
+                            {
+                                ddlDept2.SelectedValue = Session["DeptID"].ToString();
+                            }
                         }
                     }
+
+                    
 
                 }
             }
