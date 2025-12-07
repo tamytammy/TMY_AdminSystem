@@ -246,10 +246,43 @@ namespace TMY_AdminSystem.Announcements
         // 按下「刪除公告」按鈕
         protected void btnDelete_Click(object sender, EventArgs e)
         {
-            // 在這裡執行軟刪除 (UPDATE Status = 99) 或硬刪除 (DELETE)
-            // string id = hdnAnnouncementID.Value;
-            // ... 執行 SQL ...
-            // Response.Redirect("AnnouncementList.aspx");
+            string id = hdnAnnouncementID.Value;
+
+            // 1. 防呆：如果是新增模式 (ID=0) 或 ID 為空，不執行
+            if (string.IsNullOrEmpty(id) || id == "0")
+            {
+                return;
+            }
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                // 2. 撰寫 SQL：硬刪除 (DELETE FROM)
+                string sql = "DELETE FROM Announcements WHERE AnnouncementID = @ID";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@ID", id);
+
+                try
+                {
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        // 3. 刪除成功後，導回列表頁
+                        Response.Redirect("AnnList.aspx");
+                    }
+                    else
+                    {
+                        ShowMessage("刪除失敗：找不到該筆資料或已被刪除。", true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // 4. 錯誤處理 (例如：如果有附件且沒設 CASCADE DELETE，這裡會報 FK 錯誤)
+                    ShowMessage("刪除時發生錯誤：" + ex.Message, true);
+                }
+            }
         }
 
         // 按下「上傳檔案」按鈕
