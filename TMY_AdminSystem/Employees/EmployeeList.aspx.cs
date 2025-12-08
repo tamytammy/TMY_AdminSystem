@@ -643,7 +643,7 @@ namespace TMY_AdminSystem.Employees
                     break;
 
                 case "Admin":
-                    // Admin 對應 RoleID 4, 5 (雖然您說通常不設置，但預留著比較保險)
+                    // Admin 對應 RoleID 4, 5 (暫不設置)
                     ddlRoleID.Items.Add(new ListItem("總經理 (Rank 4)", "4"));
                     ddlRoleID.Items.Add(new ListItem("董事長 (Rank 5)", "5"));
                     break;
@@ -659,12 +659,13 @@ namespace TMY_AdminSystem.Employees
         {
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                // 邏輯：只抓 Status=1 (已發布) 且 日期 <= 今天 (非未來排程)
-                string sql = @"SELECT TOP 5 
+                //排程狀態沒有自動轉變，因此這邊抓兩種狀態
+                //根據Azure SQL時間會有時差，因此用 DATEADD 調整8小時
+                string sql = @"SELECT TOP 5
                                 A.AnnouncementID, A.Title, A.PublishDate, C.CategoryName 
                                FROM Announcements A
                                LEFT JOIN AnnouncementCategories C ON A.CategoryID = C.CategoryID
-                               WHERE A.Status = 1 AND A.PublishDate <= GETDATE()
+                               WHERE A.Status IN (1, 2) AND A.PublishDate <= DATEADD(hour, 8, GETDATE())
                                ORDER BY A.PublishDate DESC";
 
                 SqlDataAdapter da = new SqlDataAdapter(sql, conn);
