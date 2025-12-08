@@ -54,9 +54,8 @@
 
 ##  作者資訊 
 
-### 開發者：何怡德 Tammy
-### Email：momo09041027@gamil.com
-* 歡迎來信，我一定會看！
+* 開發者：何怡德 Tammy
+* Email：momo09041027@gamil.com (歡迎來信，我一定會看！)
 
 
 ---
