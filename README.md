@@ -12,7 +12,7 @@
 
 ---
 
-## 🛠️ 使用技術 (Tech Stack)
+## 使用技術 (Tech Stack)
 
 ### Backend & Database
 * **Framework:** .NET Framework 4.0 / ASP.NET Web Forms
@@ -30,7 +30,7 @@
 
 ---
 
-## ✨ 主要功能 (Key Features)
+## 主要功能 (Key Features)
 
 ### 1. 員工與權限管理 (RBAC)
 * 實作 **Role-Based Access Control**，區分 Admin、Manager、User 權限。
