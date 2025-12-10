@@ -660,7 +660,7 @@ namespace TMY_AdminSystem.Employees
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 //排程狀態沒有自動轉變，因此這邊抓兩種狀態
-                //根據Azure SQL時間會有時差，因此用 DATEADD 調整8小時
+                //根據Azure SQL時間會有時差，因此用 DATEADD 調整8小時 ( GETDATE() / DATEADD(hour, 8, GETDATE()) )
                 string sql = @"SELECT TOP 5
                                 A.AnnouncementID, A.Title, A.PublishDate, C.CategoryName 
                                FROM Announcements A

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -90,6 +91,8 @@ namespace TMY_AdminSystem.Announcements
                 rptAttachments.DataBind();
             }
         }
+
+
         protected void tempSave(bool isDraft)
         {
                 //首先比對isDraft來決定status的值，接下來比對id看是否已經存在，是新增或update
@@ -230,6 +233,13 @@ namespace TMY_AdminSystem.Announcements
                 ValidationSummary1.CssClass = isError ? "alert alert-danger" : "alert alert-info";
             }
         }
+
+
+        // 按下「草稿」按鈕
+        protected void btnSaveDraft_Click(object sender, EventArgs e)
+        {
+            tempSave(true);
+        }
         // 按下「儲存」按鈕
         protected void btnSave_Click(object sender, EventArgs e)
         {
@@ -291,6 +301,12 @@ namespace TMY_AdminSystem.Announcements
             // 檢查是否有選取檔案
             if (fileUploadAttachment.HasFiles)
             {
+                if (!fileUploadAttachment.HasFiles)
+                {
+                    Page.ClientScript.RegisterStartupScript(this.GetType(), "alert", "alert('請先選取要上傳的檔案。');", true);
+                    return;
+                }
+
                 // 取得目前公告 ID
                 string id = hdnAnnouncementID.Value;
                 if (id == "0")
@@ -300,16 +316,84 @@ namespace TMY_AdminSystem.Announcements
                     return;
                 }
 
-                // 處理多檔案上傳
-                foreach (var file in fileUploadAttachment.PostedFiles)
+                //檔案格式限制白名單
+                string[] allowedExtensions = { ".pdf", ".docx", ".xlsx", ".png", ".jpg", ".jpeg" };
+
+                string savePath = Server.MapPath("~/Uploads/Announcements/");
+
+                if(!Directory.Exists(savePath))
                 {
-                    // 1. 產生安全的路徑 (e.g., /Uploads/Announcements/guid_filename.pdf)
-                    // 2. file.SaveAs(serverPath);
-                    // 3. 將檔案資訊 (FileName, FilePath, AnnouncementID) INSERT 到 AnnouncementAttachments 資料表
+                    Directory.CreateDirectory(savePath);
                 }
 
-                // 重新載入附件列表
-                //LoadAttachments(id);
+                int successCount = 0;
+                string errorMsg = "";
+
+     
+                    using (SqlConnection conn = new SqlConnection(connStr))
+                    {
+                        conn.Open();
+
+                        // 處理多檔案上傳
+                       foreach (var file in fileUploadAttachment.PostedFiles)
+{
+    string fileName = Path.GetFileName(file.FileName); // 原始檔名 (使用者看到的，如 report.pdf)
+    string fileExt = Path.GetExtension(fileName).ToLower(); // 副檔名
+
+    // 1. 檢查格式限制
+    if (!allowedExtensions.Contains(fileExt))
+    {
+        errorMsg += $"檔案 {fileName} 格式不符，已略過。\\n";
+        continue;
+    }
+
+    // 2. 產生安全的路徑 (硬碟存檔用亂碼，確保路徑唯一不報錯)
+    string newFileName = Guid.NewGuid().ToString() + fileExt;
+    string fullSavePath = Path.Combine(savePath, newFileName);
+
+    // 3. 儲存檔案到伺服器硬碟
+    file.SaveAs(fullSavePath);
+
+    // 4. 將資訊寫入資料庫
+    // 注意：這裡假設你的 AttachmentID 是需要程式產生的 GUID
+    string sql = @"INSERT INTO AnnouncementAttachments 
+                   (AnnouncementID, FileName, FilePath, UploadDate) 
+                   VALUES 
+                   (@AnnouncementID, @FileName, @FilePath, GETDATE())";
+
+    using (SqlCommand cmd = new SqlCommand(sql, conn))
+    {
+        // --- 參數設定 ---
+
+        // 公告 ID
+        cmd.Parameters.AddWithValue("@AnnouncementID", id);
+
+        // 原始檔名 (顯示用，重複沒關係)
+        cmd.Parameters.AddWithValue("@FileName", fileName);
+
+        // 檔案路徑 (指向伺服器上那個亂碼命名的檔案，確保下載正確)
+        cmd.Parameters.AddWithValue("@FilePath", "~/Uploads/" + newFileName);
+
+        cmd.ExecuteNonQuery();
+    }
+}
+                    successCount++;
+                    }
+
+                    // 重新載入附件列表 (假設你有這個方法)
+                     LoadAttachments(id);
+
+                // 顯示結果
+                string finalMsg = $"成功上傳 {successCount} 個檔案。";
+                    if (!string.IsNullOrEmpty(errorMsg))
+                    {
+                        finalMsg += "\\n" + errorMsg;
+                    }
+
+                    Page.ClientScript.RegisterStartupScript(this.GetType(), "alert", $"alert('{finalMsg}');", true);
+
+                
+  
             }
         }
 
@@ -324,7 +408,7 @@ namespace TMY_AdminSystem.Announcements
                 // 2. 執行 SQL "DELETE FROM AnnouncementAttachments WHERE AttachmentID = @ID"
 
                 // 重新載入附件列表
-                //LoadAttachments(hdnAnnouncementID.Value);
+                LoadAttachments(hdnAnnouncementID.Value);
             }
         }
 
@@ -333,10 +417,8 @@ namespace TMY_AdminSystem.Announcements
         {
             Response.Redirect("AnnList.aspx");
         }
-
-        protected void btnSaveDraft_Click(object sender, EventArgs e)
-        {
-            tempSave(true);
-        }
+        
+        
+        
     }
 }
